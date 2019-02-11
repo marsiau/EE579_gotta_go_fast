@@ -8,7 +8,7 @@
 int main(void)
 {
 	WDTCTL = WDTPW | WDTHOLD;	// stop watchdog timer
-
+	PM5CTL0 &= ~LOCKLPM5;
 	
 
 

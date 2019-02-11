@@ -12,7 +12,10 @@
 #include <stdint.h>                             //For uintX_t
 
 //----- Variable definitions -----
-// Statically-initialized variable
+/*
+ * Using FRAM to store calibration values
+ * */
+// Statically-initialised variable
 #ifdef __TI_COMPILER_VERSION__
     #pragma PERSISTENT(white_lvl)
     extern uint16_t white_lvl;
