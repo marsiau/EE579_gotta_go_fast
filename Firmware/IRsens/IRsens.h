@@ -11,7 +11,7 @@
 #include <msp430.h>
 #include <stdint.h>//For uintX_t
 #include <stdbool.h>//For bool
-#include <string.h>//For strcpy()//could get away without it
+//#include <string.h>//For strcpy()//could get away without it
 
 //----- Variable definitions -----
 /*
@@ -37,6 +37,7 @@ extern bool calib_flag;//Calibration flag
 
 //----- Function declarations -----
 void IR_init();
+void ADC_GPIO_init();
 void IR_calibrate();
 void IR_scan();
 

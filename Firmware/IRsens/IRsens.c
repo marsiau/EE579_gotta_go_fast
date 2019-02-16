@@ -24,7 +24,7 @@ __interrupt void Timer0_A0_ISR(void)
       {
           //Store the value
           SYSCFG0 &= ~PFWP;                   //Program FRAM write enable
-          strncpy(white_lvl, ADCMEM0, 16);//+-ERR
+          white_lvl = ADCMEM0;//+-ERR
           SYSCFG0 |= PFWP;                    //Program FRAM write protected
           //Go back to normal runtime
           calib_flag = false;
@@ -69,6 +69,11 @@ void IR_init()
     TA1CTL = TASSEL_1 | MC_1 | TACLR;                       //ACLK, up mode
 }
 
+//Init GPIO pins used for ADC
+void ADC_GPIO_init()
+{
+    //Need this if using external MUX
+}
 void IR_calibrate()
 {
     calib_flag = true;
