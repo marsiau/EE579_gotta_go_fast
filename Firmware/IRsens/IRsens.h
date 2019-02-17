@@ -18,7 +18,7 @@
  * Using FRAM to store calibration values
  * */
 //Constants
-#define ERR = 100; //Define ADC error margin
+extern const uint8_t ERR; //Define ADC error margin
 
 // Statically-initialised variables
 #ifdef __TI_COMPILER_VERSION__

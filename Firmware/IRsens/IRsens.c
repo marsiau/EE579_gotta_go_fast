@@ -7,7 +7,8 @@
 #include "IRsens.h"
 
 //--------------- Variable definitions ---------------
-calib_flag = false;
+const uint8_t ERR = 100;
+bool calib_flag = false;
 uint16_t white_lvl = 0;
 //uint16_t ground_lvl = 0;
 
@@ -33,9 +34,10 @@ __interrupt void Timer0_A0_ISR(void)
       }
       else
       {
-          if(ADCMEM0 < white_lvl)//<>??
+          if(ADCMEM0 > (white_lvl - ERR))//<>??
           {
               //White line has been detected, breake out of the LP3 to deal with it
+              __no_operation();
               __bic_SR_register_on_exit(LPM3_bits);         //Exit LPM3
           }
           break;
@@ -80,7 +82,7 @@ void IR_calibrate()
     //Turn off & reset the ADC timer
     TA1CTL = MC_0 | TACLR; //Stop & clear the timer
     ADCIFG &= ~(0x01);//Clear interrupt flag
-    ADCIE &= ~ADCIE0;//Disable the interrupt
+    //ADCIE &= ~ADCIE0;//Disable the interrupt
     //Re-setup ADC
     ADCCTL0 &= ~ADCENC;//Disable ADC conversions
     ADCCTL1 |= ADCSHS_0;//ADCSC as ADC sample-and-hold source

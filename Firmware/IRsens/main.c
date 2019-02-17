@@ -12,6 +12,8 @@ __interrupt void P1_interrupt_handler(void)
     __delay_cycles(5000);                      //Simple debauncing
     if(!(P1IN & BIT2))
     {
+        P4OUT  ^= BIT0;
+        __no_operation();
         IR_calibrate();
     }
     break;
@@ -25,12 +27,25 @@ int main(void)
 	
 
 	IR_init();
-	IR_scan();
-	__enable_interrupt();
+	//IR_scan();
 
-	void(1)
+
+    //Setup up output LED pin
+    P4DIR |= BIT0;
+    P4OUT &= ~BIT0;
+    //Setup the input button
+    P1DIR &= ~BIT2;                             //P1.2 as input
+    P1REN |= BIT2;                              //Enable pull up/down resistor on P1.2
+    P1OUT |= BIT2;                              //Select pull up
+    P1IES |= BIT2;                              //Interrupt on high-to-low transition
+    P1IE  |= BIT2;                              //Interrupt enabled
+    P1IFG &= ~BIT2;                             //P1.2 interrupt flag cleared
+
+    __enable_interrupt();
+	while(1)
 	{
 	    //??
+	    P4OUT  ^= BIT0;                         //Toggle the LED using XOR
 	    __bis_SR_register(LPM3_bits + GIE);     // Enter LPM3 w/interrupt
 	    __no_operation();
 	}
