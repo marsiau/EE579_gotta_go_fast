@@ -4,6 +4,6 @@
 	* Using FRAM to store calibration results
 
 ### ToDo:
-	- [x] ~~Write init functions~~
-	- [x] ~~Write calibration function~~
+	- [x] ~~ Write init functions ~~
+	- [x] ~~ Write calibration function ~~
 	- [ ] Use ADC "Sequence-of-Channels Mode" instead of external multiplexer 
