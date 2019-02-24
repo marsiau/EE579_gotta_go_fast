@@ -48,12 +48,7 @@ int main( void )
     
     
     ADCsetup();
-//    __bis_SR_register(LPM3_bits|GIE);             // Enter LPM0
+    __bis_SR_register(LPM3_bits|GIE);             // Enter LPM0
     __no_operation();                         // For debugger
       __enable_interrupt();
-    while(1){
-      if (ADCMEM0 < 0x155)
-        P1OUT &= ~BIT0;                                   // Clear P1.0 LED off
-      else
-        P1OUT |= BIT0;     }
 }
