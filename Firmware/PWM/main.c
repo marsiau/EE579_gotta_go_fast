@@ -12,15 +12,15 @@ __interrupt void ADC_ISR(void)
   {
   case ADCIV_ADCIFG:              // Ready for a reading
     if(ADCMEM0 > 1000)
-      TA0CCR1 = 99; //Update TA0CCR0
+      PWM_DutyCycle(100); // Sets up the duty cycle of the PWM
     else if(ADCMEM0 > 795)
-      TA0CCR1 = 75;
+      PWM_DutyCycle(75);
     else if (ADCMEM0 > 591)
-      TA0CCR1 = 50;
+      PWM_DutyCycle(50);
     else if (ADCMEM0 > 387)
-      TA0CCR1 = 25;
+      PWM_DutyCycle(25);
     else
-      TA0CCR1 = 0;
+      PWM_DutyCycle(0);
     break;
   }
 }
@@ -33,22 +33,16 @@ int main( void )
     P1DIR |= BIT6 | BIT7;                     // P1.6 and P1.7 output
     P1SEL0 |= BIT6 | BIT7;                    // P1.6 and P1.7 options select
     
-    P1DIR |= BIT0;
-    
     // Disable the GPIO power-on default high-impedance mode to activate
     // previously configured port settings
     PM5CTL0 &= ~LOCKLPM5;
-    ClockSetup();
-    TA0CCR0 = 100-1;                         // PWM Period
-    TA0CCTL1 = OUTMOD_7;                      // CCR1 reset/set
-    TA0CCR1 = 75;                            // CCR1 PWM duty cycle
-   // TA0CCTL2 = OUTMOD_7;                      // CCR2 reset/set
-   // TA0CCR2 = 250;                            // CCR2 PWM duty cycle
-    TA0CTL = TASSEL__ACLK | MC__UP | TACLR;  // SMCLK, up mode, clear TAR
     
+    ACLKClockSetup();
+    PWM_TimerSetup();           // Sets up the timer of the PWM
+    PWM_PeriodSetup(100);       // Sets up the period of the PWM
     
     ADCsetup();
-    __bis_SR_register(LPM3_bits|GIE);             // Enter LPM0
+    
+    __bis_SR_register(LPM3_bits|GIE);          // Enter LPM3
     __no_operation();                         // For debugger
-      __enable_interrupt();
 }
