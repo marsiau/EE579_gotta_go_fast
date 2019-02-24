@@ -1,1 +1,3 @@
+The code for PWM is found in this folder
 
+So far the PWM can be used in LPM3 with ACLK.
