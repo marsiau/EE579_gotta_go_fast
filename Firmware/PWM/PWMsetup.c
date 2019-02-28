@@ -17,13 +17,32 @@ void ACLKClockSetup(){
 void PWM_TimerSetup(){
     TA0CTL = TASSEL__ACLK | MC__UP | TACLR;  // ACLK, up mode, clear TAR
     TA0CCTL1 = OUTMOD_7;                     // CCR1 reset/set  P1.7/TA0.1
-    TA0CCTL2 = OUTMOD_3;                     // CCR2 reset/set  P1.6/TA0.2
+    TA0CCTL2 = OUTMOD_7;                     // CCR2 reset/set  P1.6/TA0.2
 }
 
 void PWM_PeriodSetup(int Period){
-    TA0CCR0 = Period-1;                         // PWM Period
+    TA0CCR0 = Period-1;                      // PWM Period setup
 }
-extern void PWM_DutyCycle(int Period){
-    TA0CCR1 = Period; 
-    TA0CCR2 = Period;
+extern void MoveFWD(int DutyCycle){          // Moves the car forward with a duty cycle given by "DutyCycle"
+//    TA0CTL |= TACLR;
+    TA0CCR1 = DutyCycle; 
+    TA0CCR2 = 0;                             // Set the "DutyCycle" to 0
+    TA0CCTL1 = OUTMOD_7;                     // CCR1 reset/set  P1.7/TA0.1
+    TA0CCTL2 = OUTMOD_5;                     // CCR2 reset      P1.6/TA0.2
+}
+
+extern void MoveRWD(int DutyCycle){	    // Moves the car backwards with a duty cycle given by "DutyCycle"
+//    TA0CTL |= TACLR;
+    TA0CCR1 = 0;                            // Set the "DutyCycle" to 0
+    TA0CCR2 = DutyCycle;
+    TA0CCTL1 = OUTMOD_5;                     // CCR1 reset      P1.7/TA0.1
+    TA0CCTL2 = OUTMOD_7;                     // CCR2 reset/set  P1.6/TA0.2
+}
+
+extern void Stop(){		             // Stops the car
+//    TA0CTL |= TACLR;
+    TA0CCR1 = 0;                             // Set the "DutyCycle" to 0        
+    TA0CCR2 = 0;                             // Set the "DutyCycle" to 0
+    TA0CCTL1 = OUTMOD_5;                     // CCR1 reset   P1.7/TA0.1
+    TA0CCTL2 = OUTMOD_5;                     // CCR2 reset   P1.6/TA0.2
 }
