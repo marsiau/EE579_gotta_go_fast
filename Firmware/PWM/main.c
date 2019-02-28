@@ -30,7 +30,6 @@ __interrupt void P1_ISR(void)
     __delay_cycles(5000);    // Debouncing, Wait and then check if P1.3 is still Low
     if(!(P1IN & BIT3)){
       TA0CTL |= TACLR;
-      MoveFWD(DutyCycle);
       FWD_flag = 1;
       RWD_flag = 0;
       P1IFG &= ~BIT3;
@@ -41,7 +40,6 @@ __interrupt void P1_ISR(void)
     __delay_cycles(5000);    // Debouncing, Wait and then check if P1.4 is still Low
     if(!(P1IN & BIT4)){
       TA0CTL |= TACLR;
-      MoveRWD(DutyCycle);
       FWD_flag = 0;
       RWD_flag = 1;
       P1IFG &= ~BIT4;       //this issue will appear when SW2 is pressed at LED7
