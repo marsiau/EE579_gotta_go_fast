@@ -1,3 +1,13 @@
 The code for PWM is found in this folder
 
-So far the PWM can be used in LPM3 with ACLK.
+Capabilities:
+
+Two adjustable PWM signals for moving the car forward or backwards.
+Easy testing of each mode (forward,backward,stop) using the MSP buttons
+Easy adjustment of the Duty Cycle using the scaled value of ADCMEM0
+
+Testing specifications:
+Compatible with LPM3, with XT1 -> ACLK
+Requires P1.7 | P1.6 as outputs for the two PWM signals
+Requires P1.2 | P1.3 (SW1) | P1.4 (SW2) as inputs for choosing the direction. P1.2 = stop | P1.3 = FWD | P1.4 = RWD
+Requires Timer_A0 (TA0) for the PWM signals generation and TA0CCR1 -> P1.7 | TA0CCR2 -> P1.6
