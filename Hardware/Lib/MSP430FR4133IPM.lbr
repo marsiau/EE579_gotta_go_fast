@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--/526002/34782/2.36/64/4/Hardware/-->
+<!DOCTYPE curve SYSTEM "eagle.dtd">
+<eagle version="7.7.0">
+<drawing>
+<settings>
+<setting alwaysvectorfont="no"/>
+<setting verticaltext="up"/>
+</settings>
+<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
+<layers>
+<layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
+<layer number="16" name="Bottom" color="1" fill="1" visible="yes" active="yes"/>
+<layer number="17" name="Pads" color="2" fill="1" visible="yes" active="yes"/>
+<layer number="18" name="Vias" color="2" fill="1" visible="yes" active="yes"/>
+<layer number="19" name="Unrouted" color="6" fill="1" visible="yes" active="yes"/>
+<layer number="20" name="Dimension" color="15" fill="1" visible="yes" active="yes"/>
+<layer number="21" name="tPlace" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="22" name="bPlace" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="23" name="tOrigins" color="15" fill="1" visible="yes" active="yes"/>
+<layer number="24" name="bOrigins" color="15" fill="1" visible="yes" active="yes"/>
+<layer number="25" name="tNames" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="26" name="bNames" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="27" name="tValues" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="28" name="bValues" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="29" name="tStop" color="7" fill="3" visible="no" active="yes"/>
+<layer number="30" name="bStop" color="7" fill="6" visible="no" active="yes"/>
+<layer number="31" name="tCream" color="7" fill="4" visible="no" active="yes"/>
+<layer number="32" name="bCream" color="7" fill="5" visible="no" active="yes"/>
+<layer number="33" name="tFinish" color="6" fill="3" visible="no" active="yes"/>
+<layer number="34" name="bFinish" color="6" fill="6" visible="no" active="yes"/>
+<layer number="35" name="tGlue" color="7" fill="4" visible="no" active="yes"/>
+<layer number="36" name="bGlue" color="7" fill="5" visible="no" active="yes"/>
+<layer number="37" name="tTest" color="7" fill="1" visible="no" active="yes"/>
+<layer number="38" name="bTest" color="7" fill="1" visible="no" active="yes"/>
+<layer number="39" name="tKeepout" color="4" fill="11" visible="yes" active="yes"/>
+<layer number="40" name="bKeepout" color="1" fill="11" visible="yes" active="yes"/>
+<layer number="41" name="tRestrict" color="4" fill="10" visible="yes" active="yes"/>
+<layer number="42" name="bRestrict" color="1" fill="10" visible="yes" active="yes"/>
+<layer number="43" name="vRestrict" color="2" fill="10" visible="yes" active="yes"/>
+<layer number="44" name="Drills" color="7" fill="1" visible="no" active="yes"/>
+<layer number="45" name="Holes" color="7" fill="1" visible="no" active="yes"/>
+<layer number="46" name="Milling" color="3" fill="1" visible="no" active="yes"/>
+<layer number="47" name="Measures" color="7" fill="1" visible="no" active="yes"/>
+<layer number="48" name="Document" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="49" name="Reference" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="51" name="tDocu" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="52" name="bDocu" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="90" name="Modules" color="5" fill="1" visible="yes" active="yes"/>
+<layer number="91" name="Nets" color="2" fill="1" visible="yes" active="yes"/>
+<layer number="92" name="Busses" color="1" fill="1" visible="yes" active="yes"/>
+<layer number="93" name="Pins" color="2" fill="1" visible="no" active="yes"/>
+<layer number="94" name="Symbols" color="4" fill="1" visible="yes" active="yes"/>
+<layer number="95" name="Names" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="96" name="Values" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="97" name="Info" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="98" name="Guide" color="6" fill="1" visible="yes" active="yes"/>
+</layers>
+<library>
+<description>&lt;Texas Instruments MSP430FR4133IPM, 16bit MSP430 Microcontroller, 16MHz, 512 B Flash, 64-Pin LQFP&lt;/b&gt;&lt;p&gt;
+&lt;author&gt;Created by SamacSys&lt;/author&gt;</description>
+<packages>
+<package name="QFP50P1200X1200X160-64N">
+<description>&lt;b&gt;PM (S-PQFP-G64)&lt;/b&gt;&lt;br&gt;
+</description>
+<smd name="1" x="-5.738" y="3.75" dx="1.475" dy="0.3" layer="1" rot="R0"/>
+<smd name="2" x="-5.738" y="3.25" dx="1.475" dy="0.3" layer="1" rot="R0"/>
+<smd name="3" x="-5.738" y="2.75" dx="1.475" dy="0.3" layer="1" rot="R0"/>
+<smd name="4" x="-5.738" y="2.25" dx="1.475" dy="0.3" layer="1" rot="R0"/>
+<smd name="5" x="-5.738" y="1.75" dx="1.475" dy="0.3" layer="1" rot="R0"/>
+<smd name="6" x="-5.738" y="1.25" dx="1.475" dy="0.3" layer="1" rot="R0"/>
+<smd name="7" x="-5.738" y="0.75" dx="1.475" dy="0.3" layer="1" rot="R0"/>
+<smd name="8" x="-5.738" y="0.25" dx="1.475" dy="0.3" layer="1" rot="R0"/>
+<smd name="9" x="-5.738" y="-0.25" dx="1.475" dy="0.3" layer="1" rot="R0"/>
+<smd name="10" x="-5.738" y="-0.75" dx="1.475" dy="0.3" layer="1" rot="R0"/>
+<smd name="11" x="-5.738" y="-1.25" dx="1.475" dy="0.3" layer="1" rot="R0"/>
+<smd name="12" x="-5.738" y="-1.75" dx="1.475" dy="0.3" layer="1" rot="R0"/>
+<smd name="13" x="-5.738" y="-2.25" dx="1.475" dy="0.3" layer="1" rot="R0"/>
+<smd name="14" x="-5.738" y="-2.75" dx="1.475" dy="0.3" layer="1" rot="R0"/>
+<smd name="15" x="-5.738" y="-3.25" dx="1.475" dy="0.3" layer="1" rot="R0"/>
+<smd name="16" x="-5.738" y="-3.75" dx="1.475" dy="0.3" layer="1" rot="R0"/>
+<smd name="17" x="-3.75" y="-5.738" dx="1.475" dy="0.3" layer="1" rot="R90"/>
+<smd name="18" x="-3.25" y="-5.738" dx="1.475" dy="0.3" layer="1" rot="R90"/>
+<smd name="19" x="-2.75" y="-5.738" dx="1.475" dy="0.3" layer="1" rot="R90"/>
+<smd name="20" x="-2.25" y="-5.738" dx="1.475" dy="0.3" layer="1" rot="R90"/>
+<smd name="21" x="-1.75" y="-5.738" dx="1.475" dy="0.3" layer="1" rot="R90"/>
+<smd name="22" x="-1.25" y="-5.738" dx="1.475" dy="0.3" layer="1" rot="R90"/>
+<smd name="23" x="-0.75" y="-5.738" dx="1.475" dy="0.3" layer="1" rot="R90"/>
+<smd name="24" x="-0.25" y="-5.738" dx="1.475" dy="0.3" layer="1" rot="R90"/>
+<smd name="25" x="0.25" y="-5.738" dx="1.475" dy="0.3" layer="1" rot="R90"/>
+<smd name="26" x="0.75" y="-5.738" dx="1.475" dy="0.3" layer="1" rot="R90"/>
+<smd name="27" x="1.25" y="-5.738" dx="1.475" dy="0.3" layer="1" rot="R90"/>
+<smd name="28" x="1.75" y="-5.738" dx="1.475" dy="0.3" layer="1" rot="R90"/>
+<smd name="29" x="2.25" y="-5.738" dx="1.475" dy="0.3" layer="1" rot="R90"/>
+<smd name="30" x="2.75" y="-5.738" dx="1.475" dy="0.3" layer="1" rot="R90"/>
+<smd name="31" x="3.25" y="-5.738" dx="1.475" dy="0.3" layer="1" rot="R90"/>
+<smd name="32" x="3.75" y="-5.738" dx="1.475" dy="0.3" layer="1" rot="R90"/>
+<smd name="33" x="5.738" y="-3.75" dx="1.475" dy="0.3" layer="1" rot="R0"/>
+<smd name="34" x="5.738" y="-3.25" dx="1.475" dy="0.3" layer="1" rot="R0"/>
+<smd name="35" x="5.738" y="-2.75" dx="1.475" dy="0.3" layer="1" rot="R0"/>
+<smd name="36" x="5.738" y="-2.25" dx="1.475" dy="0.3" layer="1" rot="R0"/>
+<smd name="37" x="5.738" y="-1.75" dx="1.475" dy="0.3" layer="1" rot="R0"/>
+<smd name="38" x="5.738" y="-1.25" dx="1.475" dy="0.3" layer="1" rot="R0"/>
+<smd name="39" x="5.738" y="-0.75" dx="1.475" dy="0.3" layer="1" rot="R0"/>
+<smd name="40" x="5.738" y="-0.25" dx="1.475" dy="0.3" layer="1" rot="R0"/>
+<smd name="41" x="5.738" y="0.25" dx="1.475" dy="0.3" layer="1" rot="R0"/>
+<smd name="42" x="5.738" y="0.75" dx="1.475" dy="0.3" layer="1" rot="R0"/>
+<smd name="43" x="5.738" y="1.25" dx="1.475" dy="0.3" layer="1" rot="R0"/>
+<smd name="44" x="5.738" y="1.75" dx="1.475" dy="0.3" layer="1" rot="R0"/>
+<smd name="45" x="5.738" y="2.25" dx="1.475" dy="0.3" layer="1" rot="R0"/>
+<smd name="46" x="5.738" y="2.75" dx="1.475" dy="0.3" layer="1" rot="R0"/>
+<smd name="47" x="5.738" y="3.25" dx="1.475" dy="0.3" layer="1" rot="R0"/>
+<smd name="48" x="5.738" y="3.75" dx="1.475" dy="0.3" layer="1" rot="R0"/>
+<smd name="49" x="3.75" y="5.738" dx="1.475" dy="0.3" layer="1" rot="R90"/>
+<smd name="50" x="3.25" y="5.738" dx="1.475" dy="0.3" layer="1" rot="R90"/>
+<smd name="51" x="2.75" y="5.738" dx="1.475" dy="0.3" layer="1" rot="R90"/>
+<smd name="52" x="2.25" y="5.738" dx="1.475" dy="0.3" layer="1" rot="R90"/>
+<smd name="53" x="1.75" y="5.738" dx="1.475" dy="0.3" layer="1" rot="R90"/>
+<smd name="54" x="1.25" y="5.738" dx="1.475" dy="0.3" layer="1" rot="R90"/>
+<smd name="55" x="0.75" y="5.738" dx="1.475" dy="0.3" layer="1" rot="R90"/>
+<smd name="56" x="0.25" y="5.738" dx="1.475" dy="0.3" layer="1" rot="R90"/>
+<smd name="57" x="-0.25" y="5.738" dx="1.475" dy="0.3" layer="1" rot="R90"/>
+<smd name="58" x="-0.75" y="5.738" dx="1.475" dy="0.3" layer="1" rot="R90"/>
+<smd name="59" x="-1.25" y="5.738" dx="1.475" dy="0.3" layer="1" rot="R90"/>
+<smd name="60" x="-1.75" y="5.738" dx="1.475" dy="0.3" layer="1" rot="R90"/>
+<smd name="61" x="-2.25" y="5.738" dx="1.475" dy="0.3" layer="1" rot="R90"/>
+<smd name="62" x="-2.75" y="5.738" dx="1.475" dy="0.3" layer="1" rot="R90"/>
+<smd name="63" x="-3.25" y="5.738" dx="1.475" dy="0.3" layer="1" rot="R90"/>
+<smd name="64" x="-3.75" y="5.738" dx="1.475" dy="0.3" layer="1" rot="R90"/>
+<text x="0" y="0" align="center" size="1.27" layer="25" rot="R0" >&gt;NAME</text>
+<text x="0" y="0" align="center" size="1.27" layer="27" rot="R0" >&gt;VALUE</text>
+<wire x1="-6.725" y1="6.725" x2="6.725" y2="6.725" width="0.05" layer="51"/>
+<wire x1="6.725" y1="6.725" x2="6.725" y2="-6.725" width="0.05" layer="51"/>
+<wire x1="6.725" y1="-6.725" x2="-6.725" y2="-6.725" width="0.05" layer="51"/>
+<wire x1="-6.725" y1="-6.725" x2="-6.725" y2="6.725" width="0.05" layer="51"/>
+<wire x1="-5" y1="5" x2="5" y2="5" width="0.1" layer="51"/>
+<wire x1="5" y1="5" x2="5" y2="-5" width="0.1" layer="51"/>
+<wire x1="5" y1="-5" x2="-5" y2="-5" width="0.1" layer="51"/>
+<wire x1="-5" y1="-5" x2="-5" y2="5" width="0.1" layer="51"/>
+<wire x1="-5" y1="4.5" x2="-4.5" y2="5" width="0.1" layer="51"/>
+<wire x1="-4.65" y1="4.65" x2="4.65" y2="4.65" width="0.2" layer="21"/>
+<wire x1="4.65" y1="4.65" x2="4.65" y2="-4.65" width="0.2" layer="21"/>
+<wire x1="4.65" y1="-4.65" x2="-4.65" y2="-4.65" width="0.2" layer="21"/>
+<wire x1="-4.65" y1="-4.65" x2="-4.65" y2="4.65" width="0.2" layer="21"/>
+<circle x="-6.225" y="4.5" radius="0.125" width="0.25" layer="25"/>
+</package>
+</packages>
+<symbols>
+<symbol name="MSP430FR4133IPM">
+<wire x1="5.08" y1="15.24" x2="48.26" y2="15.24" width="0.254" layer="94"/>
+<wire x1="48.26" y1="-88.9" x2="48.26" y2="15.24" width="0.254" layer="94"/>
+<wire x1="48.26" y1="-88.9" x2="5.08" y2="-88.9" width="0.254" layer="94"/>
+<wire x1="5.08" y1="15.24" x2="5.08" y2="-88.9" width="0.254" layer="94"/>
+<text x="49.53" y="20.32" align="center-left" size="1.778" layer="95">&gt;NAME</text>
+<text x="49.53" y="17.78" align="center-left" size="1.778" layer="96">&gt;VALUE</text>
+<pin name="P4.7/R13" x="0" y="0" length="middle" direction="io" rot="R0"/>
+<pin name="P4.6/R23" x="0" y="-2.54" length="middle" direction="io" rot="R0"/>
+<pin name="P4.5/R33" x="0" y="-5.08" length="middle" direction="io" rot="R0"/>
+<pin name="P4.4/LCDCAP1" x="0" y="-7.62" length="middle" direction="io" rot="R0"/>
+<pin name="P4.3/LCDCAP0" x="0" y="-10.16" length="middle" direction="io" rot="R0"/>
+<pin name="P4.2/XOUT" x="0" y="-12.7" length="middle" direction="io" rot="R0"/>
+<pin name="P4.1/XIN" x="0" y="-15.24" length="middle" direction="io" rot="R0"/>
+<pin name="DVSS" x="0" y="-17.78" length="middle" direction="io" rot="R0"/>
+<pin name="DVCC" x="0" y="-20.32" length="middle" direction="io" rot="R0"/>
+<pin name="RST/NMI/SBWTDIO" x="0" y="-22.86" length="middle" direction="io" rot="R0"/>
+<pin name="TEST/SBWTCK" x="0" y="-25.4" length="middle" direction="io" rot="R0"/>
+<pin name="P4.0/TA1.1" x="0" y="-27.94" length="middle" direction="io" rot="R0"/>
+<pin name="P8.3/TA1.2" x="0" y="-30.48" length="middle" direction="io" rot="R0"/>
+<pin name="P8.2/TA1CLK" x="0" y="-33.02" length="middle" direction="io" rot="R0"/>
+<pin name="P8.1/ACLK/A9" x="0" y="-35.56" length="middle" direction="io" rot="R0"/>
+<pin name="P8.0/SMCLK/A8" x="0" y="-38.1" length="middle" direction="io" rot="R0"/>
+<pin name="P1.7/TA0.1/TDO/A7" x="7.62" y="-93.98" length="middle" direction="io" rot="R90"/>
+<pin name="P1.6/TA0.2/TDI/TCLK/A6" x="10.16" y="-93.98" length="middle" direction="pwr" rot="R90"/>
+<pin name="P1.5/TA0CLK/TMS/A5" x="12.7" y="-93.98" length="middle" direction="io" rot="R90"/>
+<pin name="P1.4/MCLK/TCK/A4/VREF+" x="15.24" y="-93.98" length="middle" direction="io" rot="R90"/>
+<pin name="P1.3/UCA0STE/A3" x="17.78" y="-93.98" length="middle" direction="io" rot="R90"/>
+<pin name="P1.2/UCA0CLK/A2" x="20.32" y="-93.98" length="middle" direction="io" rot="R90"/>
+<pin name="P1.1/_/A1/_UCA0RXD/UCA0SOMI_VEREF+" x="22.86" y="-93.98" length="middle" direction="io" rot="R90"/>
+<pin name="P1.0/_/A0/VEREF-_UCA0TXD/UCA0SIMO" x="25.4" y="-93.98" length="middle" direction="io" rot="R90"/>
+<pin name="P5.7/L39" x="27.94" y="-93.98" length="middle" direction="io" rot="R90"/>
+<pin name="P5.6/L38" x="30.48" y="-93.98" length="middle" direction="io" rot="R90"/>
+<pin name="P5.5/L37" x="33.02" y="-93.98" length="middle" direction="io" rot="R90"/>
+<pin name="P5.4/L36" x="35.56" y="-93.98" length="middle" direction="io" rot="R90"/>
+<pin name="P5.3/UCB0SOMI/UCB0SCL/L35" x="38.1" y="-93.98" length="middle" direction="io" rot="R90"/>
+<pin name="P5.2/UCB0SIMO/UCB0SDA/L34" x="40.64" y="-93.98" length="middle" direction="io" rot="R90"/>
+<pin name="P5.1/UCB0CLK/L33" x="43.18" y="-93.98" length="middle" direction="io" rot="R90"/>
+<pin name="P5.0/UCB0STE/L32" x="45.72" y="-93.98" length="middle" direction="io" rot="R90"/>
+<pin name="P6.0/L16" x="53.34" y="0" length="middle" direction="io" rot="R180"/>
+<pin name="P6.1/L17" x="53.34" y="-2.54" length="middle" direction="io" rot="R180"/>
+<pin name="P6.2/L18" x="53.34" y="-5.08" length="middle" direction="io" rot="R180"/>
+<pin name="P6.3/L19" x="53.34" y="-7.62" length="middle" direction="io" rot="R180"/>
+<pin name="P6.4/L20" x="53.34" y="-10.16" length="middle" direction="io" rot="R180"/>
+<pin name="P6.5/L21" x="53.34" y="-12.7" length="middle" direction="io" rot="R180"/>
+<pin name="P6.6/L22" x="53.34" y="-15.24" length="middle" direction="io" rot="R180"/>
+<pin name="P6.7/L23" x="53.34" y="-17.78" length="middle" direction="io" rot="R180"/>
+<pin name="P2.0/L24" x="53.34" y="-20.32" length="middle" direction="io" rot="R180"/>
+<pin name="P2.1/L25" x="53.34" y="-22.86" length="middle" direction="io" rot="R180"/>
+<pin name="P2.2/L26" x="53.34" y="-25.4" length="middle" direction="io" rot="R180"/>
+<pin name="P2.3/L27" x="53.34" y="-27.94" length="middle" direction="io" rot="R180"/>
+<pin name="P2.4/L28" x="53.34" y="-30.48" length="middle" direction="io" rot="R180"/>
+<pin name="P2.5/L29" x="53.34" y="-33.02" length="middle" direction="io" rot="R180"/>
+<pin name="P2.6/L30" x="53.34" y="-35.56" length="middle" direction="io" rot="R180"/>
+<pin name="P2.7/L31" x="53.34" y="-38.1" length="middle" direction="io" rot="R180"/>
+<pin name="P7.0/L0" x="7.62" y="20.32" length="middle" direction="io" rot="R270"/>
+<pin name="P7.1/L1" x="10.16" y="20.32" length="middle" direction="io" rot="R270"/>
+<pin name="P7.2/L2" x="12.7" y="20.32" length="middle" direction="io" rot="R270"/>
+<pin name="P7.3/L3" x="15.24" y="20.32" length="middle" direction="io" rot="R270"/>
+<pin name="P7.4/L4" x="17.78" y="20.32" length="middle" direction="io" rot="R270"/>
+<pin name="P7.5/L5" x="20.32" y="20.32" length="middle" direction="io" rot="R270"/>
+<pin name="P7.6/L6" x="22.86" y="20.32" length="middle" direction="io" rot="R270"/>
+<pin name="P7.7/L7" x="25.4" y="20.32" length="middle" direction="io" rot="R270"/>
+<pin name="P3.0/L8" x="27.94" y="20.32" length="middle" direction="io" rot="R270"/>
+<pin name="P3.1/L9" x="30.48" y="20.32" length="middle" direction="io" rot="R270"/>
+<pin name="P3.2/L10" x="33.02" y="20.32" length="middle" direction="io" rot="R270"/>
+<pin name="P3.3/L11" x="35.56" y="20.32" length="middle" direction="io" rot="R270"/>
+<pin name="P3.4/L12" x="38.1" y="20.32" length="middle" direction="io" rot="R270"/>
+<pin name="P3.5/L13" x="40.64" y="20.32" length="middle" direction="io" rot="R270"/>
+<pin name="P3.6/L14" x="43.18" y="20.32" length="middle" direction="io" rot="R270"/>
+<pin name="P3.7/L15" x="45.72" y="20.32" length="middle" direction="io" rot="R270"/>
+</symbol>
+</symbols>
+<devicesets>
+<deviceset name="MSP430FR4133IPM" prefix="H">
+<description>&lt;b&gt;Texas Instruments MSP430FR4133IPM, 16bit MSP430 Microcontroller, 16MHz, 512 B Flash, 64-Pin LQFP&lt;/b&gt;&lt;p&gt;
+Source: &lt;a href="http://uk.rs-online.com/web/p/products/1629844"&gt; Datasheet &lt;/a&gt;</description>
+<gates>
+<gate name="G$1" symbol="MSP430FR4133IPM" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="QFP50P1200X1200X160-64N">
+<connects>
+<connect gate="G$1" pin="P4.7/R13" pad="1"/>
+<connect gate="G$1" pin="P4.6/R23" pad="2"/>
+<connect gate="G$1" pin="P4.5/R33" pad="3"/>
+<connect gate="G$1" pin="P4.4/LCDCAP1" pad="4"/>
+<connect gate="G$1" pin="P4.3/LCDCAP0" pad="5"/>
+<connect gate="G$1" pin="P4.2/XOUT" pad="6"/>
+<connect gate="G$1" pin="P4.1/XIN" pad="7"/>
+<connect gate="G$1" pin="DVSS" pad="8"/>
+<connect gate="G$1" pin="DVCC" pad="9"/>
+<connect gate="G$1" pin="RST/NMI/SBWTDIO" pad="10"/>
+<connect gate="G$1" pin="TEST/SBWTCK" pad="11"/>
+<connect gate="G$1" pin="P4.0/TA1.1" pad="12"/>
+<connect gate="G$1" pin="P8.3/TA1.2" pad="13"/>
+<connect gate="G$1" pin="P8.2/TA1CLK" pad="14"/>
+<connect gate="G$1" pin="P8.1/ACLK/A9" pad="15"/>
+<connect gate="G$1" pin="P8.0/SMCLK/A8" pad="16"/>
+<connect gate="G$1" pin="P1.7/TA0.1/TDO/A7" pad="17"/>
+<connect gate="G$1" pin="P1.6/TA0.2/TDI/TCLK/A6" pad="18"/>
+<connect gate="G$1" pin="P1.5/TA0CLK/TMS/A5" pad="19"/>
+<connect gate="G$1" pin="P1.4/MCLK/TCK/A4/VREF+" pad="20"/>
+<connect gate="G$1" pin="P1.3/UCA0STE/A3" pad="21"/>
+<connect gate="G$1" pin="P1.2/UCA0CLK/A2" pad="22"/>
+<connect gate="G$1" pin="P1.1/_/A1/_UCA0RXD/UCA0SOMI_VEREF+" pad="23"/>
+<connect gate="G$1" pin="P1.0/_/A0/VEREF-_UCA0TXD/UCA0SIMO" pad="24"/>
+<connect gate="G$1" pin="P5.7/L39" pad="25"/>
+<connect gate="G$1" pin="P5.6/L38" pad="26"/>
+<connect gate="G$1" pin="P5.5/L37" pad="27"/>
+<connect gate="G$1" pin="P5.4/L36" pad="28"/>
+<connect gate="G$1" pin="P5.3/UCB0SOMI/UCB0SCL/L35" pad="29"/>
+<connect gate="G$1" pin="P5.2/UCB0SIMO/UCB0SDA/L34" pad="30"/>
+<connect gate="G$1" pin="P5.1/UCB0CLK/L33" pad="31"/>
+<connect gate="G$1" pin="P5.0/UCB0STE/L32" pad="32"/>
+<connect gate="G$1" pin="P2.7/L31" pad="33"/>
+<connect gate="G$1" pin="P2.6/L30" pad="34"/>
+<connect gate="G$1" pin="P2.5/L29" pad="35"/>
+<connect gate="G$1" pin="P2.4/L28" pad="36"/>
+<connect gate="G$1" pin="P2.3/L27" pad="37"/>
+<connect gate="G$1" pin="P2.2/L26" pad="38"/>
+<connect gate="G$1" pin="P2.1/L25" pad="39"/>
+<connect gate="G$1" pin="P2.0/L24" pad="40"/>
+<connect gate="G$1" pin="P6.7/L23" pad="41"/>
+<connect gate="G$1" pin="P6.6/L22" pad="42"/>
+<connect gate="G$1" pin="P6.5/L21" pad="43"/>
+<connect gate="G$1" pin="P6.4/L20" pad="44"/>
+<connect gate="G$1" pin="P6.3/L19" pad="45"/>
+<connect gate="G$1" pin="P6.2/L18" pad="46"/>
+<connect gate="G$1" pin="P6.1/L17" pad="47"/>
+<connect gate="G$1" pin="P6.0/L16" pad="48"/>
+<connect gate="G$1" pin="P3.7/L15" pad="49"/>
+<connect gate="G$1" pin="P3.6/L14" pad="50"/>
+<connect gate="G$1" pin="P3.5/L13" pad="51"/>
+<connect gate="G$1" pin="P3.4/L12" pad="52"/>
+<connect gate="G$1" pin="P3.3/L11" pad="53"/>
+<connect gate="G$1" pin="P3.2/L10" pad="54"/>
+<connect gate="G$1" pin="P3.1/L9" pad="55"/>
+<connect gate="G$1" pin="P3.0/L8" pad="56"/>
+<connect gate="G$1" pin="P7.7/L7" pad="57"/>
+<connect gate="G$1" pin="P7.6/L6" pad="58"/>
+<connect gate="G$1" pin="P7.5/L5" pad="59"/>
+<connect gate="G$1" pin="P7.4/L4" pad="60"/>
+<connect gate="G$1" pin="P7.3/L3" pad="61"/>
+<connect gate="G$1" pin="P7.2/L2" pad="62"/>
+<connect gate="G$1" pin="P7.1/L1" pad="63"/>
+<connect gate="G$1" pin="P7.0/L0" pad="64"/>
+</connects>
+<technologies>
+<technology name="">
+<attribute name="RS_Part_Number" value="1629844" constant="no"/>
+<attribute name="Manufacturer_Name" value="Texas Instruments" constant="no"/>
+<attribute name="Manufacturer_Part_Number" value="MSP430FR4133IPM" constant="no"/>
+<attribute name="Description" value="Texas Instruments MSP430FR4133IPM, 16bit MSP430 Microcontroller, 16MHz, 512 B Flash, 64-Pin LQFP" constant="no"/>
+<attribute name="Height" value="1.6mm" constant="no"/>
+</technology>
+</technologies>
+</device>
+</devices>
+</deviceset>
+</devicesets>
+</library>
+</drawing>
+</eagle>
