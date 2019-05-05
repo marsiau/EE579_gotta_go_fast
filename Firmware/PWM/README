@@ -2,12 +2,28 @@ The code for PWM is found in this folder
 
 Capabilities:
 
-Two adjustable PWM signals for moving the car forward or backwards.
-Easy testing of each mode (forward,backward,stop) using the MSP buttons
-Easy adjustment of the Duty Cycle using the scaled value of ADCMEM0
+Two adjustable PWM signals for moving the car forward or reverse, called using Forward/Reverse functions.
+Function for Left steering which outputs a continous signal set high (GPIO 3.3V)
+Function for Right steering which outputs a continous signal set high (GPIO 3.3V)
+
+
+The ADC is used to take readings from the POT and it is used to set the current Duty Cycle (speed of the car). ADC is triggered by TA1.1.
 
 Testing specifications:
 Compatible with LPM3, with XT1 -> ACLK
-Requires P1.7 | P1.6 as outputs for the two PWM signals
-Requires P1.2 | P1.3 (SW1) | P1.4 (SW2) as inputs for choosing the direction. P1.2 = stop | P1.3 = FWD | P1.4 = RWD
-Requires Timer_A0 (TA0) for the PWM signals generation and TA0CCR1 -> P1.7 | TA0CCR2 -> P1.6
+
+The following push buttons are used to drive the car:
+P2.6 -> Reverse
+P1.2 -> Forward
+P1.3 -> Right
+P1.4 -> Left
+
+Output signals that control the H-bridge are found on the following pins:
+P1.7 (PWMed) -> Forward
+P1.6 (PWMed) -> Reverse
+P1.6 (GPIO) -> Right
+P5.0 (GPIO) -> Left
+
+Requires Timer_A0 (TA0) in UP mode for the PWM signals generation and TA0CCR1 -> P1.7 | TA0CCR2 -> P1.6
+
+GO TEAM!
