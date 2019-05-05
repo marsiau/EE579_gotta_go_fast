@@ -19,8 +19,8 @@ void ADCsetup(){
   
   //Timer TA1.1B Configuration for ADC Trigger Signal
   //Initialize TAxCCRn
-  TA1CCR0 |= 0x800; //count up to 2048 with a frequency of 32768 Hz which means 1/16s
-  TA1CCR1 |= 0x400; //count up to 1024 with a frequency of 32768 Hz which means 1/32s
+  TA1CCR0 |= 0x80; //count up to 2048 with a frequency of 32768 Hz which means 1/16s
+  TA1CCR1 |= 0x20; //count up to 1024 with a frequency of 32768 Hz which means 1/32s
 
   //Apply desired config to TAxIV, TAIDEX and TAxCCTLn
   TA1CCTL1 |= OUTMOD_4 ; // Interrupt enabled | By default Capture Mode
