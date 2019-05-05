@@ -1,11 +1,14 @@
 #include "io430.h"
-//#include <msp430.h>
+
+typedef int bool;
+#define true 1
+#define false 0
 
 extern void ACLKClockSetup();
 extern void PWM_PeriodSetup(int Period);
 extern void PWM_TimerSetup();
-extern void MoveFWD(int DutyCycle);
-extern void MoveRWD(int DutyCycle);
-extern void MoveLeft();
-extern void MoveRight();
+extern bool MoveFWD(int DutyCycle, int Cycles, int CyclesLimit);
+extern bool MoveRWD(int DutyCycle, int Cycles, int CyclesLimit);
+extern bool MoveLeft(int Cycles, int CyclesLimit);
+extern bool MoveRight(int Cycles, int CyclesLimit);
 extern void Stop();

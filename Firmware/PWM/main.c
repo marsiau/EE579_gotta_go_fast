@@ -2,10 +2,6 @@
 #include "PWMsetup.h"
 #include "ADC_Timers_Setup.h"
 
-typedef int bool;
-#define true 1
-#define false 0
-
 bool FWD_flag = 0;
 bool RWD_flag = 0;
 bool Left_flag = 0;
@@ -15,7 +11,7 @@ int DutyCycle = 0;
 
 int PWMPeriod = 100;
 
-int MovementCyclesLimit = 331; // 1 s = 331 Cycles
+int MovementCyclesLimit = 331; // 1 second = 331 Cycles
 int MovementCyclesCounter = 0; // Counts the number of cycles
 
 // Counts how many seconds have passed while moving in X direction
@@ -25,10 +21,10 @@ int LeftCycleCounter = 0;
 int RightCycleCounter = 0;
 
 // Duration of the movements is in seconds
-int ForwardCycleCounterLimit = 5;
-int ReverseCycleCounterLimit = 10;
-int LeftCycleCounterLimit = 3;
-int RightCycleCounterLimit = 2;
+int ForwardCycleCounterLimit = 5 * 331;
+int ReverseCycleCounterLimit = 10 * 331;
+int LeftCycleCounterLimit = 3 * 331;
+int RightCycleCounterLimit = 2 * 331;
 
 #pragma vector = PORT2_VECTOR
 __interrupt void P2_ISR(void)
@@ -103,47 +99,32 @@ void __attribute__ ((interrupt(TIMER0_A0_VECTOR))) Timer_A (void)
 #else
 #error Compiler not supported!
 #endif
-{
+{ 
+  // This part is used to test that 331 cycles = 1 second by toggling the LED
   if(MovementCyclesCounter == MovementCyclesLimit){
-    ForwardCycleCounter++;
-    ReverseCycleCounter++;
-    LeftCycleCounter++;
-    RightCycleCounter++;
-    
-    // These IF statements check if the duration limit of a move has been 
-    // reached and stop that move
-    if(ForwardCycleCounter==ForwardCycleCounterLimit){
-      ForwardCycleCounter = 0;
-      FWD_flag = 0;
-      TA0CCR1 = 0;
-      TA0CCTL1 = OUTMOD_5;
-    }
-    if(ReverseCycleCounter==ReverseCycleCounterLimit){
-      ReverseCycleCounter = 0;
-      RWD_flag = 0;
-      TA0CCR2 = 0; 
-      TA0CCTL2 = OUTMOD_5;
-    }
-    if(LeftCycleCounter==LeftCycleCounterLimit){
-      LeftCycleCounter = 0;
-      Left_flag = 0;
-      P1OUT &= ~(BIT5);
-    }
-    if(RightCycleCounter==RightCycleCounterLimit){
-      RightCycleCounter = 0;
-      Right_flag = 0;
-      P5OUT &= ~(BIT0);
-    }
-    P4OUT ^= BIT0;
+    P4OUT ^= BIT0; // Led is toggled every 3.02ms (DEBUGGER)
     MovementCyclesCounter = 0;
   }
-  else {
-    if(FWD_flag == 1) MoveFWD(DutyCycle);
-    else if(RWD_flag == 1) MoveRWD(DutyCycle);
-    if(Left_flag == 1) MoveLeft();
-    else if(Right_flag == 1) MoveRight();
-    MovementCyclesCounter++;
+  else{
+    MovementCyclesCounter++;// Used to toggle LED4.0 every second
   }
+  //--------------------------------------------------
+  if(FWD_flag == 1) {
+    FWD_flag = MoveFWD(DutyCycle,ForwardCycleCounter,ForwardCycleCounterLimit);
+  }
+  else if(RWD_flag == 1) {
+    RWD_flag = MoveRWD(DutyCycle,ReverseCycleCounter,ReverseCycleCounterLimit);
+  }
+  if(Left_flag == 1) {
+    Left_flag = MoveLeft(LeftCycleCounter,LeftCycleCounterLimit);
+  }
+  else if(Right_flag == 1){
+    Right_flag = MoveRight(RightCycleCounter,RightCycleCounterLimit);
+  }
+  ForwardCycleCounter++;
+  ReverseCycleCounter++;
+  LeftCycleCounter++;
+  RightCycleCounter++;
 }
 
 int main( void )
@@ -151,7 +132,7 @@ int main( void )
   // Stop watchdog timer to prevent time out reset
   WDTCTL = WDTPW | WDTHOLD;                 // Stop WDT
   
-  P1DIR |= BIT0| BIT5 | BIT6 | BIT7; // P1.6(RWD) and P1.7 (FWD) P1.5(Left) output
+  P1DIR |= BIT5 | BIT6 | BIT7; // P1.6(RWD) and P1.7 (FWD) P1.5(Left) output
   P1SEL0|= BIT6 | BIT7;               // P1.7 options select
   
   P5DIR |= BIT0;                      //P5.0(Right) output mode
@@ -172,10 +153,10 @@ int main( void )
   P2REN |= BIT6;   // P2.6 pull-up register enable
   P2IES |= BIT6;   // P2.6 Hi/Low edge transition
   P2IE  |= BIT6;   // P2.6 interrupt enabled
-  P2IFG &= ~BIT6; // Clear interrupt flag of P2.6
-    
-  P4DIR |= BIT0; // Used to visualize the movement cycles during the run time
-    
+  P2IFG &= ~BIT6;  // Clear interrupt flag of P2.6
+  
+  P4DIR |= BIT0; // (DEBUGGER) Used to visualize the movement cycles during the run time
+  
   // Disable the GPIO power-on default high-impedance mode to activate
   // previously configured port settings
   PM5CTL0 &= ~LOCKLPM5;
