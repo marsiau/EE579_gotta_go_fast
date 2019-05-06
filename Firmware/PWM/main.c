@@ -21,10 +21,10 @@ int LeftCycleCounter = 0;
 int RightCycleCounter = 0;
 
 // Duration of the movements is in seconds
-int ForwardCycleCounterLimit = 5 * 331;
-int ReverseCycleCounterLimit = 10 * 331;
-int LeftCycleCounterLimit = 3 * 331;
-int RightCycleCounterLimit = 2 * 331;
+int ForwardCycleCounterLimit = 2 * 331;
+int ReverseCycleCounterLimit = 2 * 331;
+int LeftCycleCounterLimit = 1 * 331;
+int RightCycleCounterLimit = 1 * 331;
 
 #pragma vector = PORT2_VECTOR
 __interrupt void P2_ISR(void)
@@ -111,20 +111,37 @@ void __attribute__ ((interrupt(TIMER0_A0_VECTOR))) Timer_A (void)
   //--------------------------------------------------
   if(FWD_flag == 1) {
     FWD_flag = MoveFWD(DutyCycle,ForwardCycleCounter,ForwardCycleCounterLimit);
+    if(FWD_flag == 1) ForwardCycleCounter++;
+    else if(FWD_flag == 0) {
+      ForwardCycleCounterLimit += 331;
+      ForwardCycleCounter = 0;
+    }
   }
   else if(RWD_flag == 1) {
     RWD_flag = MoveRWD(DutyCycle,ReverseCycleCounter,ReverseCycleCounterLimit);
+    if(RWD_flag == 1) ReverseCycleCounter++;
+    else if(RWD_flag == 0) {
+      ReverseCycleCounterLimit += 331;
+      ReverseCycleCounter = 0;
+    }
   }
+  
   if(Left_flag == 1) {
     Left_flag = MoveLeft(LeftCycleCounter,LeftCycleCounterLimit);
+    if(Left_flag == 1) LeftCycleCounter++;
+    else if(Left_flag == 0) {
+      LeftCycleCounterLimit += 331;
+      LeftCycleCounter = 0;
+    }
   }
   else if(Right_flag == 1){
     Right_flag = MoveRight(RightCycleCounter,RightCycleCounterLimit);
+    if(Right_flag == 1) RightCycleCounter++;
+    else if (Right_flag == 0){
+      RightCycleCounterLimit += 331;
+      RightCycleCounter = 0;
+    }
   }
-  ForwardCycleCounter++;
-  ReverseCycleCounter++;
-  LeftCycleCounter++;
-  RightCycleCounter++;
 }
 
 int main( void )

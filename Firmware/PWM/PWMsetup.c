@@ -48,8 +48,7 @@ void PWM_PeriodSetup(int Period){
 //  P1OUT &= ~(BIT5);
 //  P5OUT |= BIT0;  
 //}
-
-extern void Stop(){		             // Stops the car
+void Stop(){		             // Stops the car
   TA0CCR1 = 0;                             // Set the "DutyCycle" to 0        
   TA0CCR2 = 0;                             // Set the "DutyCycle" to 0
   TA0CCTL1 = OUTMOD_5;                     // CCR1 reset   P1.7/TA0.1
@@ -59,7 +58,7 @@ extern void Stop(){		             // Stops the car
   P5OUT &= ~BIT0;
 }
 
-extern bool MoveFWD(int DutyCycle, int Cycles, int CyclesLimit){          // Moves the car forward with a duty cycle given by "DutyCycle"
+bool MoveFWD(int DutyCycle, int Cycles, int CyclesLimit){          // Moves the car forward with a duty cycle given by "DutyCycle"
   if(Cycles != CyclesLimit){
     TA0CCR1 = DutyCycle; 
     TA0CCR2 = 0;                             // Set the "DutyCycle" to 0
@@ -74,7 +73,7 @@ extern bool MoveFWD(int DutyCycle, int Cycles, int CyclesLimit){          // Mov
   }
 }
 
-extern bool MoveRWD(int DutyCycle, int Cycles, int CyclesLimit){    // Moves the car backwards with a duty cycle given by "DutyCycle"
+bool MoveRWD(int DutyCycle, int Cycles, int CyclesLimit){    // Moves the car backwards with a duty cycle given by "DutyCycle"
   if(Cycles != CyclesLimit){
     TA0CCR1 = 0;                             // Set the "DutyCycle" to 0
     TA0CCR2 = DutyCycle;
@@ -89,7 +88,7 @@ extern bool MoveRWD(int DutyCycle, int Cycles, int CyclesLimit){    // Moves the
   }
 }
 
-extern bool MoveLeft(int Cycles, int CyclesLimit){	    // Steers the car Left
+bool MoveLeft(int Cycles, int CyclesLimit){	    // Steers the car Left
   if(Cycles != CyclesLimit){
     P1OUT |= BIT5;
     P5OUT &= ~(BIT0);
@@ -101,7 +100,7 @@ extern bool MoveLeft(int Cycles, int CyclesLimit){	    // Steers the car Left
   }
 }
 
-extern bool MoveRight(int Cycles, int CyclesLimit){	    // Steers the car Right
+bool MoveRight(int Cycles, int CyclesLimit){	    // Steers the car Right
   if(Cycles != CyclesLimit){
     P1OUT &= ~(BIT5);
     P5OUT |= BIT0;  
