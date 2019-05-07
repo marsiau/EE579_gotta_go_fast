@@ -2,29 +2,30 @@
 #include "PWMsetup.h"
 #include "ADC_Timers_Setup.h"
 
-bool FWD_flag = 0;
-bool RWD_flag = 0;
-bool Left_flag = 0;
-bool Right_flag = 0;
+int DutyCycle = 0; // The Duty Cycle of the PWMs
+int PWMPeriod = 100; // This defines the value of the CCR0 
 
-int DutyCycle = 0;
+// Movement flags used to determine the status of the car
+enum FwdRwd_flag drive_flag = Stop;
+enum LR_flag steer_flag = Neutral;
 
-int PWMPeriod = 100;
+int FwdRwdCyclesLimit = 0; // Global variables where the cycle limit is stored
+int RLCyclesLimit = 0;
 
-int MovementCyclesLimit = 331; // 1 second = 331 Cycles
-int MovementCyclesCounter = 0; // Counts the number of cycles
+int FwdRwdCycle = 0; // Global variables where the current cycle is stored
+int RLCycle = 0;
 
-// Counts how many seconds have passed while moving in X direction
-int ForwardCycleCounter = 0;
-int ReverseCycleCounter = 0;
-int LeftCycleCounter = 0;
-int RightCycleCounter = 0;
 
-// Duration of the movements is in seconds
+// Debugging variables
+int MovementCyclesLimit = 331; // 1 second = 331 Cycles (DEBUGGING)     
+int MovementCyclesCounter = 0; // Counts the number of cycles (DEBUGGING)
+
+// Duration of the movements is in seconds (DEBUGGING)
 int ForwardCycleCounterLimit = 2 * 331;
 int ReverseCycleCounterLimit = 2 * 331;
 int LeftCycleCounterLimit = 1 * 331;
 int RightCycleCounterLimit = 1 * 331;
+// ---------------------------
 
 #pragma vector = PORT2_VECTOR
 __interrupt void P2_ISR(void)
@@ -34,9 +35,7 @@ __interrupt void P2_ISR(void)
   case P2IV_P2IFG6: //Reverse
     __delay_cycles(5000);    // Debouncing, Wait and then check if P2.6 is still Low
     if(!(P2IN & BIT6)){
-      ReverseCycleCounter=0;
-      FWD_flag = 0;
-      RWD_flag = 1;
+      Drive_RWD(DutyCycle,ReverseCycleCounterLimit);
       P2IFG &= ~BIT6;      
       break;
     }
@@ -50,28 +49,22 @@ __interrupt void P1_ISR(void)
   case P1IV_P1IFG2: //Forward
     __delay_cycles(5000);    // Debouncing, Wait and then check if P1.2 is still Low
     if(!(P1IN & BIT2)){
-      ForwardCycleCounter=0;
-      FWD_flag = 1;
-      RWD_flag = 0;
+      Drive_FWD(DutyCycle,ForwardCycleCounterLimit);
       P1IFG &= ~BIT2;
       break;
     }
     
-  case P1IV_P1IFG3: //It is SW1 // Right
+  case P1IV_P1IFG3: //It is SW1 // Left
     __delay_cycles(5000);    // Debouncing, Wait and then check if P1.3 is still Low
     if(!(P1IN & BIT3)){
-      RightCycleCounter=0;
-      Right_flag = 1;
-      Left_flag = 0 ;
+      Steer_Left(LeftCycleCounterLimit);
       P1IFG &= ~BIT3;
       break;
     }
-  case P1IV_P1IFG4:  //It is SW2 // Left
+  case P1IV_P1IFG4:  //It is SW2 // Right
     __delay_cycles(5000);    // Debouncing, Wait and then check if P1.4 is still Low
     if(!(P1IN & BIT4)){
-      LeftCycleCounter=0;
-      Right_flag = 0;
-      Left_flag = 1;
+      Steer_Right(RightCycleCounterLimit);
       P1IFG &= ~BIT4;      
       break;
     }
@@ -86,6 +79,9 @@ __interrupt void ADC_ISR(void)
   {
   case ADCIV_ADCIFG:              // Ready for a reading
     DutyCycle = ADCMEM0 / 10; // Sets up the duty cycle of the PWM
+    // This updates the speed of the car as soon as a new Duty Cycle value is calculated
+    if(drive_flag == Forward) TA0CCR1 = DutyCycle; 
+    else if (drive_flag == Reverse) TA0CCR2 = DutyCycle;
     break;
   }
 }
@@ -109,38 +105,37 @@ void __attribute__ ((interrupt(TIMER0_A0_VECTOR))) Timer_A (void)
     MovementCyclesCounter++;// Used to toggle LED4.0 every second
   }
   //--------------------------------------------------
-  if(FWD_flag == 1) {
-    FWD_flag = MoveFWD(DutyCycle,ForwardCycleCounter,ForwardCycleCounterLimit);
-    if(FWD_flag == 1) ForwardCycleCounter++;
-    else if(FWD_flag == 0) {
-      ForwardCycleCounterLimit += 331;
-      ForwardCycleCounter = 0;
+  
+  if(FwdRwdCycle < FwdRwdCyclesLimit){
+    if(drive_flag != Stop){
+      // If the cycle limit has not been reached and the status flag is not "Stop" then increment the Cycle counter
+      FwdRwdCycle++; 
     }
   }
-  else if(RWD_flag == 1) {
-    RWD_flag = MoveRWD(DutyCycle,ReverseCycleCounter,ReverseCycleCounterLimit);
-    if(RWD_flag == 1) ReverseCycleCounter++;
-    else if(RWD_flag == 0) {
-      ReverseCycleCounterLimit += 331;
-      ReverseCycleCounter = 0;
-    }
+  else{ // When cycle limit is reached stop driving
+    if(drive_flag == Forward) ForwardCycleCounterLimit += 331;
+    else if(drive_flag == Reverse) ReverseCycleCounterLimit += 331;
+    drive_flag = Stop;                       // Set the flag to "Stop"
+    FwdRwdCycle = 0;                         // Reset the cycle counter
+    TA0CCR1 = 0;                             // Set the "DutyCycle" to 0
+    TA0CCR2 = 0;                             // Set the "DutyCycle" to 0
+    TA0CCTL1 = OUTMOD_5;                     // CCR2 reset      P1.7/TA0.1
+    TA0CCTL2 = OUTMOD_5;                     // CCR2 reset      P1.6/TA0.2
   }
   
-  if(Left_flag == 1) {
-    Left_flag = MoveLeft(LeftCycleCounter,LeftCycleCounterLimit);
-    if(Left_flag == 1) LeftCycleCounter++;
-    else if(Left_flag == 0) {
-      LeftCycleCounterLimit += 331;
-      LeftCycleCounter = 0;
+  if(RLCycle < RLCyclesLimit){
+    if(steer_flag != Neutral){
+      // If the cycle limit has not been reached and the status flag is not "Neutral" then increment the Cycle counter
+      RLCycle++;
     }
   }
-  else if(Right_flag == 1){
-    Right_flag = MoveRight(RightCycleCounter,RightCycleCounterLimit);
-    if(Right_flag == 1) RightCycleCounter++;
-    else if (Right_flag == 0){
-      RightCycleCounterLimit += 331;
-      RightCycleCounter = 0;
-    }
+  else{
+    if(steer_flag == Right) RightCycleCounterLimit += 331;
+    else if(steer_flag == Left) LeftCycleCounterLimit += 331;
+    steer_flag = Neutral;                    // Set the flag to "Neutral"                
+    RLCycle = 0;                             // Reset the cycle counter   
+    P5OUT &= ~(BIT0);                        // Drive P5.0 Low (Left)
+    P1OUT &= ~(BIT5);                        // Drive P1.5 Low (Right)
   }
 }
 
@@ -149,13 +144,13 @@ int main( void )
   // Stop watchdog timer to prevent time out reset
   WDTCTL = WDTPW | WDTHOLD;                 // Stop WDT
   
-  P1DIR |= BIT5 | BIT6 | BIT7; // P1.6(RWD) and P1.7 (FWD) P1.5(Left) output
-  P1SEL0|= BIT6 | BIT7;               // P1.7 options select
+  P1DIR |= BIT5 | BIT6 | BIT7; // P1.6(RWD) and P1.7 (FWD) P1.5(Right) output
+  P1SEL0|= BIT6 | BIT7;              // P1.7 options select
   
-  P5DIR |= BIT0;                      //P5.0(Right) output mode
+  P5DIR |= BIT0;                     //P5.0(Left) output mode
   
-  P1OUT &= ~BIT5;
-  P5OUT &= ~BIT0;
+  P1OUT &= ~BIT5;                    // Drive P1.5 Low (Right)
+  P5OUT &= ~BIT0;                    // Drive P5.0 Low (Left)
   
   P4SEL0|= BIT1 | BIT2;                   // P4.2~P4.1: crystal pins
   
@@ -178,7 +173,7 @@ int main( void )
   // previously configured port settings
   PM5CTL0 &= ~LOCKLPM5;
   
-  ACLKClockSetup();
+  ACLKClockSetup();           // Connects the external oscillator XT1 to ACLK
   PWM_TimerSetup();           // Sets up the timer of the PWM
   PWM_PeriodSetup(PWMPeriod);       // Sets up the period of the PWM
   
