@@ -15,60 +15,76 @@ void ACLKClockSetup(){
   CSCTL5 |= DIVM0 | DIVS0;                          // SMCLK = MCLK = DCODIV = 1MHz, by default
 }
 void PWM_TimerSetup(){
-  TA1CTL = TASSEL__ACLK | MC__UP | TACLR;  // ACLK, UP mode, clear TAR
-  TA1CCTL0 |= CCIE;                        // Enable interrupt when CCR0 value is reached
-  TA1CCTL1 = OUTMOD_7;                     // CCR1 reset/set  P4.0/TA1.1 FWD
-  TA1CCTL2 = OUTMOD_7;                     // CCR2 reset/set  P8.3/TA1.2 RWD
+  TA0CTL = TASSEL__ACLK | MC__UP | TACLR;  // ACLK, CONT mode, clear TAR, enable interrupts
+  TA0CCTL0 |= CCIE;                        // Enable interrupt when CCR0 value is reached
+  TA0CCTL1 = OUTMOD_7;                     // CCR1 reset/set  P1.7/TA0.1
+  TA0CCTL2 = OUTMOD_7;                     // CCR2 reset/set  P1.6/TA0.2
 }
 
 void PWM_PeriodSetup(int Period){
-  TA1CCR0 = Period-1;                      // PWM Period setup
+  TA0CCR0 = Period-1;                      // PWM Period setup
 }
 
-void StopCar(){		                   // Stops the car
-  TA1CCR1 = 0;                             // Set the "DutyCycle" to 0        
-  TA1CCR2 = 0;                             // Set the "DutyCycle" to 0
-  TA1CCTL1 = OUTMOD_5;                     // CCR1 reset   P4.0/TA1.1 FWD
-  TA1CCTL2 = OUTMOD_5;                     // CCR2 reset   P8.3/TA1.2 RWD
-  TA1CTL |= TACLR;                        
-  P7OUT &= ~BIT4;                          //P7.4 Right
-  P7OUT &= ~BIT5;                          //P7.5 Left
-  drive_flag = Stop;
-  steer_flag = Neutral;
+void Stop(){		             // Stops the car
+  TA0CCR1 = 0;                             // Set the "DutyCycle" to 0        
+  TA0CCR2 = 0;                             // Set the "DutyCycle" to 0
+  TA0CCTL1 = OUTMOD_5;                     // CCR1 reset   P1.7/TA0.1
+  TA0CCTL2 = OUTMOD_5;                     // CCR2 reset   P1.6/TA0.2
+  TA0CTL |= TACLR;                        
+  P1OUT &= ~BIT5;
+  P5OUT &= ~BIT0;
 }
 
-void Drive_FWD(int DutyCycle, int CyclesLimit){ // Moves the car forward with a duty cycle given by "DutyCycle"
-  drive_flag = Forward;                    // Overwrites the global drive flag
-  FwdRwdCyclesLimit = CyclesLimit;         // Overwrites the global cycle limit
-  FwdRwdCycle = 0;                         // Resets the global cycle counter
-  TA1CCR1 = DutyCycle;                     
-  TA1CCR2 = 0;                             // Set the "DutyCycle" to 0
-  TA1CCTL1 = OUTMOD_7;                     // CCR1 reset/set  P4.0/TA1.1 FWD
-  TA1CCTL2 = OUTMOD_5;                     // CCR2 reset      P8.3/TA1.2 RWD
+bool MoveFWD(int DutyCycle, int Cycles, int CyclesLimit){          // Moves the car forward with a duty cycle given by "DutyCycle"
+  if(Cycles != CyclesLimit){
+    TA0CCR1 = DutyCycle; 
+    TA0CCR2 = 0;                             // Set the "DutyCycle" to 0
+    TA0CCTL1 = OUTMOD_7;                     // CCR1 reset/set  P1.7/TA0.1
+    TA0CCTL2 = OUTMOD_5;                     // CCR2 reset      P1.6/TA0.2
+    return 1;
+  }
+  else{ // Limit has been reached, stop moving forward
+    TA0CCR1 = 0;                             // Set the "DutyCycle" to 0
+    TA0CCTL1 = OUTMOD_5;                     // CCR1 reset      P1.7/TA0.1
+    return 0;
+  }
 }
 
-void Drive_RWD(int DutyCycle, int CyclesLimit){    // Moves the car backwards with a duty cycle given by "DutyCycle"
-  drive_flag = Reverse;                    // Overwrites the global drive flag
-  FwdRwdCyclesLimit = CyclesLimit;         // Overwrites the global cycle limit
-  FwdRwdCycle = 0;                         // Resets the global cycle counter
-  TA1CCR1 = 0;                             // Set the "DutyCycle" to 0
-  TA1CCR2 = DutyCycle;
-  TA1CCTL1 = OUTMOD_5;                     // CCR1 reset      P4.0/TA1.1 FWD
-  TA1CCTL2 = OUTMOD_7;                     // CCR2 reset/set  P8.3/TA1.2 RWD
+bool MoveRWD(int DutyCycle, int Cycles, int CyclesLimit){    // Moves the car backwards with a duty cycle given by "DutyCycle"
+  if(Cycles != CyclesLimit){
+    TA0CCR1 = 0;                             // Set the "DutyCycle" to 0
+    TA0CCR2 = DutyCycle;
+    TA0CCTL1 = OUTMOD_5;                     // CCR1 reset      P1.7/TA0.1
+    TA0CCTL2 = OUTMOD_7;                     // CCR2 reset/set  P1.6/TA0.2
+    return 1;
+  }
+  else{ // Limit has been reached, stop reversing
+    TA0CCR2 = 0;                             // Set the "DutyCycle" to 0
+    TA0CCTL2 = OUTMOD_5;                     // CCR2 reset  P1.6/TA0.2
+    return 0;
+  }
 }
 
-void Steer_Left(int CyclesLimit){	    // Steers the car Left
-  steer_flag = Left;                        // Overwrites the global steer flag
-  RLCyclesLimit = CyclesLimit;              // Overwrites the global cycle limit
-  RLCycle = 0;                              // Resets the global cycle counter  
-  P7OUT |=  BIT5;                             
-  P7OUT &= ~BIT4;                           
+bool MoveLeft(int Cycles, int CyclesLimit){	    // Steers the car Left
+  if(Cycles != CyclesLimit){
+    P1OUT |= BIT5;
+    P5OUT &= ~(BIT0);
+    return 1;
+  }
+  else{ // Limit has been reached, stop steering left
+    P1OUT &= ~(BIT5);
+    return 0;
+  }
 }
 
-void Steer_Right(int CyclesLimit){	    // Steers the car Right
-  steer_flag = Right;                       // Overwrites the global steer flag
-  RLCyclesLimit = CyclesLimit;              // Overwrites the global cycle limit
-  RLCycle = 0;                              // Resets the global cycle counter
-  P7OUT &= ~BIT5;  
-  P7OUT |=  BIT4;
+bool MoveRight(int Cycles, int CyclesLimit){	    // Steers the car Right
+  if(Cycles != CyclesLimit){
+    P1OUT &= ~(BIT5);
+    P5OUT |= BIT0;  
+    return 1;
+  }
+  else{ // Limit has been reached, stop steering right
+    P5OUT &= ~(BIT0);
+    return 0;
+  }
 }
