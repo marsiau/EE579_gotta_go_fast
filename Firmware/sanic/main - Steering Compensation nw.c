@@ -1,6 +1,5 @@
 #include "io430.h"
 #include "PWMsetup.h"
-#include "ADC_Timers_Setup.h"
 
 int DutyCycle = 75; // The Duty Cycle of the PWMs
 int PWMPeriod = 100; // This defines the value of the CCR0 
