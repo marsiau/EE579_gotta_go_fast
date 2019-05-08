@@ -29,7 +29,7 @@ int main(void)
 	IR_init();
 	//IR_scan();
 
-
+/*
     //Setup up output LED pin
     P4DIR |= BIT0;
     P4OUT &= ~BIT0;
@@ -40,7 +40,7 @@ int main(void)
     P1IES |= BIT2;                              //Interrupt on high-to-low transition
     P1IE  |= BIT2;                              //Interrupt enabled
     P1IFG &= ~BIT2;                             //P1.2 interrupt flag cleared
-
+*//
     __enable_interrupt();
 	while(1)
 	{

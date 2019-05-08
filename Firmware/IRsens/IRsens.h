@@ -4,14 +4,13 @@
  *  Created on: 7 Feb 2019
  *      Author: marsiau
  */
-
 #ifndef IRSENS_H_
 #define IRSENS_H_
 
 #include <msp430.h>
 #include <stdint.h>//For uintX_t
 #include <stdbool.h>//For bool
-//#include <string.h>//For strcpy()//could get away without it
+//#include <string.h>//For strcpy()
 
 //----- Variable definitions -----
 /*
@@ -24,21 +23,18 @@ extern const uint8_t ERR; //Define ADC error margin
 #ifdef __TI_COMPILER_VERSION__
     #pragma PERSISTENT(white_lvl)
     extern uint16_t white_lvl;
-    //#pragma PERSISTENT(ground_lvl)
-    //extern uint16_t ground_lvl;
 #elif __IAR_SYSTEMS_ICC__
     __persistent extern uint16_t white_lvl = 0;
-    _//_persistent extern uint16_t ground_lvl = 0;
 #endif
 
 // Global variables
 extern bool calib_flag;//Calibration flag
-
+extern bool BumpSwitch_flag[4];
+extern bool IRSens_flag[4];
 
 //----- Function declarations -----
-void IR_init();
-void ADC_GPIO_init();
-void IR_calibrate();
-void IR_scan();
-
+void IR_calibrate();//Calibrate the threshold value
+void IR_init();//Setup ADC & timer for A9 (P8.1) only
+void IR_scan();//Start ADC scan
+void IR_stop();//
 #endif /* IRSENS_H_ */
