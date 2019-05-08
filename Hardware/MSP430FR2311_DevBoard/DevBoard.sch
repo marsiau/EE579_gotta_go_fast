@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="9.3.1">
+<eagle version="9.3.2">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -8552,10 +8552,10 @@ Source: &lt;a href="http://www.ti.com/lit/ds/symlink/tlv758p.pdf"&gt; Datasheet 
 <part name="GND4" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
 <part name="JP4" library="pinhead" library_urn="urn:adsk.eagle:library:325" deviceset="PINHD-2X4" device="" package3d_urn="urn:adsk.eagle:package:22461/2"/>
 <part name="IC2" library="TLV75801PDRVT" deviceset="TLV75801PDRVT" device=""/>
-<part name="C5" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="C-EU" device="C0805K" package3d_urn="urn:adsk.eagle:package:23681/2"/>
-<part name="C6" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="C-EU" device="C0805K" package3d_urn="urn:adsk.eagle:package:23681/2"/>
-<part name="R5" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-EU_" device="R0805" package3d_urn="urn:adsk.eagle:package:23553/2"/>
-<part name="R6" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-EU_" device="R0805" package3d_urn="urn:adsk.eagle:package:23553/2"/>
+<part name="10UF" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="C-EU" device="C0805K" package3d_urn="urn:adsk.eagle:package:23681/2"/>
+<part name="0.1UF" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="C-EU" device="C0805K" package3d_urn="urn:adsk.eagle:package:23681/2"/>
+<part name="5K" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-EU_" device="R0805" package3d_urn="urn:adsk.eagle:package:23553/2"/>
+<part name="1K" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-EU_" device="R0805" package3d_urn="urn:adsk.eagle:package:23553/2"/>
 <part name="P+3" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="+5V" device=""/>
 <part name="+3V4" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="+3V3" device=""/>
 <part name="GND9" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
@@ -8650,19 +8650,19 @@ Source: &lt;a href="http://www.ti.com/lit/ds/symlink/tlv758p.pdf"&gt; Datasheet 
 <attribute name="NAME" x="199.39" y="83.82" size="1.778" layer="95" align="center-left"/>
 <attribute name="VALUE" x="199.39" y="81.28" size="1.778" layer="96" align="center-left"/>
 </instance>
-<instance part="C5" gate="G$1" x="208.28" y="63.5" smashed="yes">
+<instance part="10UF" gate="G$1" x="208.28" y="63.5" smashed="yes">
 <attribute name="NAME" x="209.804" y="63.881" size="1.778" layer="95"/>
 <attribute name="VALUE" x="209.804" y="58.801" size="1.778" layer="96"/>
 </instance>
-<instance part="C6" gate="G$1" x="160.02" y="63.5" smashed="yes">
+<instance part="0.1UF" gate="G$1" x="160.02" y="63.5" smashed="yes">
 <attribute name="NAME" x="161.544" y="63.881" size="1.778" layer="95"/>
 <attribute name="VALUE" x="161.544" y="58.801" size="1.778" layer="96"/>
 </instance>
-<instance part="R5" gate="G$1" x="167.64" y="71.12" smashed="yes" rot="R90">
+<instance part="5K" gate="G$1" x="167.64" y="71.12" smashed="yes" rot="R90">
 <attribute name="NAME" x="166.1414" y="67.31" size="1.778" layer="95" rot="R90"/>
 <attribute name="VALUE" x="170.942" y="67.31" size="1.778" layer="96" rot="R90"/>
 </instance>
-<instance part="R6" gate="G$1" x="167.64" y="55.88" smashed="yes" rot="R90">
+<instance part="1K" gate="G$1" x="167.64" y="55.88" smashed="yes" rot="R90">
 <attribute name="NAME" x="166.1414" y="52.07" size="1.778" layer="95" rot="R90"/>
 <attribute name="VALUE" x="170.942" y="52.07" size="1.778" layer="96" rot="R90"/>
 </instance>
@@ -8735,8 +8735,8 @@ Source: &lt;a href="http://www.ti.com/lit/ds/symlink/tlv758p.pdf"&gt; Datasheet 
 <pinref part="GND4" gate="1" pin="GND"/>
 </segment>
 <segment>
-<pinref part="R6" gate="G$1" pin="1"/>
-<pinref part="C6" gate="G$1" pin="2"/>
+<pinref part="1K" gate="G$1" pin="1"/>
+<pinref part="0.1UF" gate="G$1" pin="2"/>
 <wire x1="160.02" y1="58.42" x2="160.02" y2="50.8" width="0.1524" layer="91"/>
 <wire x1="160.02" y1="50.8" x2="167.64" y2="50.8" width="0.1524" layer="91"/>
 <junction x="167.64" y="50.8"/>
@@ -8749,7 +8749,7 @@ Source: &lt;a href="http://www.ti.com/lit/ds/symlink/tlv758p.pdf"&gt; Datasheet 
 <wire x1="187.96" y1="50.8" x2="187.96" y2="48.26" width="0.1524" layer="91"/>
 <wire x1="172.72" y1="50.8" x2="187.96" y2="50.8" width="0.1524" layer="91"/>
 <junction x="187.96" y="50.8"/>
-<pinref part="C5" gate="G$1" pin="2"/>
+<pinref part="10UF" gate="G$1" pin="2"/>
 <wire x1="208.28" y1="58.42" x2="208.28" y2="50.8" width="0.1524" layer="91"/>
 <wire x1="187.96" y1="50.8" x2="208.28" y2="50.8" width="0.1524" layer="91"/>
 <pinref part="GND9" gate="1" pin="GND"/>
@@ -8781,12 +8781,12 @@ Source: &lt;a href="http://www.ti.com/lit/ds/symlink/tlv758p.pdf"&gt; Datasheet 
 </segment>
 <segment>
 <pinref part="IC2" gate="G$1" pin="OUT"/>
-<pinref part="R5" gate="G$1" pin="2"/>
+<pinref part="5K" gate="G$1" pin="2"/>
 <wire x1="172.72" y1="76.2" x2="167.64" y2="76.2" width="0.1524" layer="91"/>
 <pinref part="+3V4" gate="G$1" pin="+3V3"/>
 <wire x1="157.48" y1="76.2" x2="160.02" y2="76.2" width="0.1524" layer="91"/>
 <junction x="167.64" y="76.2"/>
-<pinref part="C6" gate="G$1" pin="1"/>
+<pinref part="0.1UF" gate="G$1" pin="1"/>
 <wire x1="160.02" y1="76.2" x2="167.64" y2="76.2" width="0.1524" layer="91"/>
 <wire x1="160.02" y1="66.04" x2="160.02" y2="76.2" width="0.1524" layer="91"/>
 <junction x="160.02" y="76.2"/>
@@ -8883,7 +8883,7 @@ Source: &lt;a href="http://www.ti.com/lit/ds/symlink/tlv758p.pdf"&gt; Datasheet 
 <wire x1="208.28" y1="76.2" x2="210.82" y2="76.2" width="0.1524" layer="91"/>
 <wire x1="208.28" y1="76.2" x2="208.28" y2="66.04" width="0.1524" layer="91"/>
 <junction x="208.28" y="76.2"/>
-<pinref part="C5" gate="G$1" pin="1"/>
+<pinref part="10UF" gate="G$1" pin="1"/>
 <pinref part="IC2" gate="G$1" pin="EN"/>
 <wire x1="203.2" y1="71.12" x2="205.74" y2="71.12" width="0.1524" layer="91"/>
 <wire x1="205.74" y1="71.12" x2="205.74" y2="76.2" width="0.1524" layer="91"/>
@@ -9036,8 +9036,8 @@ Source: &lt;a href="http://www.ti.com/lit/ds/symlink/tlv758p.pdf"&gt; Datasheet 
 </net>
 <net name="N$12" class="0">
 <segment>
-<pinref part="R5" gate="G$1" pin="1"/>
-<pinref part="R6" gate="G$1" pin="2"/>
+<pinref part="5K" gate="G$1" pin="1"/>
+<pinref part="1K" gate="G$1" pin="2"/>
 <wire x1="167.64" y1="66.04" x2="167.64" y2="63.5" width="0.1524" layer="91"/>
 <pinref part="IC2" gate="G$1" pin="FB"/>
 <wire x1="167.64" y1="63.5" x2="167.64" y2="60.96" width="0.1524" layer="91"/>
