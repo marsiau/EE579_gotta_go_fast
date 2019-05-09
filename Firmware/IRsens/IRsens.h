@@ -22,9 +22,9 @@ extern const uint8_t ERR; //Define ADC error margin
 // Statically-initialised variables
 #ifdef __TI_COMPILER_VERSION__
     #pragma PERSISTENT(white_lvl)
-    extern uint16_t white_lvl;
+    uint16_t white_lvl;
 #elif __IAR_SYSTEMS_ICC__
-    __persistent extern uint16_t white_lvl = 0;
+    __persistent extern uint16_t white_lvl;
 #endif
 
 // Global variables
