@@ -40,7 +40,7 @@ int main(void)
     P1IES |= BIT2;                              //Interrupt on high-to-low transition
     P1IE  |= BIT2;                              //Interrupt enabled
     P1IFG &= ~BIT2;                             //P1.2 interrupt flag cleared
-*//
+*/
     __enable_interrupt();
 	while(1)
 	{

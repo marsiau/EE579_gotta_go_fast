@@ -9,10 +9,9 @@
 //--------------- Variable definitions ---------------
 const uint8_t ERR = 100;
 bool calib_flag = false;
-bool BumpSwitch_flag = [0 0 0 0];
-bool IRSens_flag = [0 0 0 0];
-
-uint16_t white_lvl = 0;
+uint8_t IRSens_flag = 0; // 0b00 A5 A4 A3 A2 0 0
+uint16_t white_lvl;
+uint16_t ADC_chnl;
 
 //--------------- Interrupt routines ---------------
 //----- Interrupt routine for ADC -----
@@ -39,26 +38,42 @@ __interrupt void Timer0_A0_ISR(void)
             {
                 //Store the value
                 SYSCFG0 &= ~PFWP;// Program FRAM write enable
-                white_lvl = ADCMEM0;//+-ERR
+                white_lvl = ADCMEM0-ERR;//-ERR
                 SYSCFG0 |= PFWP;// Program FRAM write protected
                 calib_flag = false;
             }
-            else
+            else if(ADCMEM0 > white_lvl)
             {
-                if(ADCMEM0 > (white_lvl - ERR))//<>??
+                ADC_chnl = ADCMCTL0 && 0xF; //Extract ADCINCHx
+                switch(ADC_chnl)
                 {
-                    //switch(ADCMCTL0)
-
-                    //White line has been detected, brake out of the LP3 to deal with it
-                    __no_operation();
-                    __bic_SR_register_on_exit(LPM3_bits);         //Exit LPM3
+                    case 0x2: // A2
+                        IRSens_flag |= 0x4;
+                        break;
+                    case 0x3: // A3
+                        IRSens_flag |= 0x8;
+                        break;
+                    case 0x4: // A4
+                        IRSens_flag |= 0x10;
+                        break;
+                    case 0x5: // A5
+                        IRSens_flag |= 0x20;
+                        break;
+                    //case 0x6: // A6
+                        //store Vbat
+                        //break;
+                    default:
+                        break;
                 }
+                //White line has been detected, brake out of the LP3 to deal with it
+                __no_operation();
+                __bic_SR_register_on_exit(LPM3_bits);         //Exit LPM3
             }
             break;
         default:
             break;
     }
-s}
+}
 
 //--------------- Function declarations ---------------
 //----- Calibrate the white lvl -----
@@ -82,7 +97,7 @@ void IR_calibrate()
 
     ADCCTL0 |= ADCENC;//Enable a single conversion
 }
-//----- Initialize ADC Scan -----
+//----- Initialise ADC Scan -----
 void IR_init()
 {
     //Init GPIO pins used for ADC
@@ -101,15 +116,16 @@ void IR_init()
     ADCIE |= ADCIE0;
 
     //----- Configure trigger ADC timer TA0 -----
-    //The count-to value, 32768/8 = 4096 = 0x1000
-    TA0CTL = TACLR;                                         //Clear the timer.
-    TA0CCR0 =  0x1000;                                      //Reset every 0x1000
-    TA0CCR1 =  0x800;                                       //Toggle OUT every 0x800 to turn the ADC on 8 times/s
-    TA0CCTL1 = OUTMOD_7;                                    //TA1CCR1 toggle
-    TA0CTL = TASSEL_1 | MC_1 | TACLR;                       //ACLK, up mode
+    //32768 should be around 100Hz atm
+    TA0CTL = TACLR;// Clear the timer.
+    TA0CCR0 =  0x148;// Reset every
+    TA0CCR1 =  0xEE;// Toggle OUT every to turn the ADC on next CCR0 int
+    TA0CCTL1 |= OUTMOD_7;// TA1CCR1 toggle
+    TA0CTL |= TASSEL_1 | ID_0 | MC_0 | TACLR;// ACLK | no clock division | stop | clear
 }
 //----- Start scanning -----
 void IR_scan()
 {
-    ADCCTL0 |= ADCENC;                                      //Enable conversion
+    TA0CTL |= MC_1;// ACLK, up mode
+    ADCCTL0 |= ADCENC;// Enable conversion
 }

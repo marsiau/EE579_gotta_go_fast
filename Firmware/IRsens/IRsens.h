@@ -29,8 +29,7 @@ extern const uint8_t ERR; //Define ADC error margin
 
 // Global variables
 extern bool calib_flag;//Calibration flag
-extern bool BumpSwitch_flag[4];
-extern bool IRSens_flag[4];
+extern uint8_t IRSens_flag;
 
 //----- Function declarations -----
 void IR_calibrate();//Calibrate the threshold value
