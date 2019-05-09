@@ -1,11 +1,7 @@
 #include "io430.h"
 #include "PWMsetup.h"
 
-typedef int bool;
-#define true 1
-#define false 0
-
-int DutyCycle = 70; // The Duty Cycle of the PWMs
+int DutyCycle = 75; // The Duty Cycle of the PWMs
 int PWMPeriod = 100; // This defines the value of the CCR0 
 
 // Movement flags used to determine the status of the car
@@ -22,8 +18,9 @@ int RLCycle = 0;
 int LCycles = 0;
 int RCycles = 0;
 
+
 //scripting variables
-bool running = 0;
+int running = 0;
 int scriptcount = -1;
 int scriptselector = -1;
 
@@ -173,7 +170,7 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
         running = 0;
       }
       break;
-    default: scriptcount = 0; scriptselector = 3; break;
+    default: scriptselector = 3; break;
     } 
     break;
   case 1: //Forward-Left Sensor
@@ -219,11 +216,11 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
         running = 0;
       }
       break;
-    default: scriptcount = 0; scriptselector = 3; break;
+    default: scriptselector = 3; break;
     }
     break;
   case 2: //Back Sensor
-    switch(scriptcount){
+        switch(scriptcount){
     case 0:
       StopCar();
       running = 0;
@@ -242,7 +239,6 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
     }
     break;
   case 3: //Compensate Steering
-    P2OUT ^= BIT7;
     switch(scriptcount){
     case 0:
       StopCar();
@@ -266,11 +262,14 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
         running = 0;
       }
       break;
-    default: running = 0; scriptselector = 2; LCycles = 0; RCycles = 0; break;
+    default: running = 0; scriptselector = 2; break;
     }
     break;
   }
-   
+  
+  
+  
+  
   if(FwdRwdCycle < FwdRwdCyclesLimit){
     if(drive_flag != Stop){
       // If the cycle limit has not been reached and the status flag is not "Stop" then increment the Cycle counter
@@ -312,7 +311,7 @@ int main( void )
 {
   // Stop watchdog timer to prevent time out reset
   WDTCTL = WDTPW | WDTHOLD;                 // Stop WDT
-  
+    
   P4DIR |= BIT0;     // P4.0 (FWD)
   P8DIR |= BIT3;     // P8.3 (RWD)
   
@@ -339,8 +338,6 @@ int main( void )
   P2IFG &= ~BIT6;  // Clear interrupt flag of P2.6
   
   P4DIR |= BIT3; // (DEBUGGER) Used to visualize the movement cycles during the run time
-  P2DIR |= BIT7;
-  P2OUT &= ~BIT7;
   
   // Disable the GPIO power-on default high-impedance mode to activate
   // previously configured port settings
@@ -350,6 +347,11 @@ int main( void )
   PWM_TimerSetup();           // Sets up the timer of the PWM
   PWM_PeriodSetup(PWMPeriod);       // Sets up the period of the PWM
   
+//  ADCsetup();                 // Set up the ADC configuration
+  
   __bis_SR_register(LPM3_bits|GIE);          // Enter LPM3
   __no_operation();                         // For debugger
+  
+  
+  
 }

@@ -33,6 +33,8 @@ void StopCar(){		                   // Stops the car
   TA1CTL |= TACLR;                        
   P7OUT &= ~BIT4;                          //P7.4 Right
   P7OUT &= ~BIT5;                          //P7.5 Left
+  drive_flag = Stop;
+  steer_flag = Neutral;
 }
 
 void Drive_FWD(int DutyCycle, int CyclesLimit){ // Moves the car forward with a duty cycle given by "DutyCycle"

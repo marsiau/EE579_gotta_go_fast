@@ -2,7 +2,7 @@
 #include "PWMsetup.h"
 #include "ADC_Timers_Setup.h"
 
-int DutyCycle = 0; // The Duty Cycle of the PWMs
+int DutyCycle = 75; // The Duty Cycle of the PWMs
 int PWMPeriod = 100; // This defines the value of the CCR0 
 
 // Movement flags used to determine the status of the car
@@ -21,7 +21,7 @@ int MovementCyclesLimit = 331; // 1 second = 331 Cycles (DEBUGGING)
 int MovementCyclesCounter = 0; // Counts the number of cycles (DEBUGGING)
 
 // Duration of the movements is in seconds (DEBUGGING)
-int ForwardCycleCounterLimit = 2 * 331;
+int ForwardCycleCounterLimit =  2 * 331;
 int ReverseCycleCounterLimit = 2 * 331;
 int LeftCycleCounterLimit = 1 * 331;
 int RightCycleCounterLimit = 1 * 331;
@@ -71,34 +71,34 @@ __interrupt void P1_ISR(void)
   } 
 }
 
-//ADC Interrupt Service Routine
-#pragma vector=ADC_VECTOR           
-__interrupt void ADC_ISR(void)
-{
-  switch(__even_in_range(ADCIV,ADCIV_ADCIFG))
-  {
-  case ADCIV_ADCIFG:              // Ready for a reading
-    DutyCycle = ADCMEM0 / 10; // Sets up the duty cycle of the PWM
-    // This updates the speed of the car as soon as a new Duty Cycle value is calculated
-    if(drive_flag == Forward) TA0CCR1 = DutyCycle; 
-    else if (drive_flag == Reverse) TA0CCR2 = DutyCycle;
-    break;
-  }
-}
+////ADC Interrupt Service Routine
+//#pragma vector=ADC_VECTOR           
+//__interrupt void ADC_ISR(void)
+//{
+//  switch(__even_in_range(ADCIV,ADCIV_ADCIFG))
+//  {
+//  case ADCIV_ADCIFG:              // Ready for a reading
+//    DutyCycle = ADCMEM0 / 10; // Sets up the duty cycle of the PWM
+//    // This updates the speed of the car as soon as a new Duty Cycle value is calculated
+//    if(drive_flag == Forward) TA0CCR1 = DutyCycle; 
+//    else if (drive_flag == Reverse) TA0CCR2 = DutyCycle;
+//    break;
+//  }
+//}
 
 // Timer A0 interrupt service routine CC0
 #if defined(__TI_COMPILER_VERSION__) || defined(__IAR_SYSTEMS_ICC__)
-#pragma vector = TIMER0_A0_VECTOR
+#pragma vector = TIMER1_A0_VECTOR
 __interrupt void Timer_A (void)
 #elif defined(__GNUC__)
-void __attribute__ ((interrupt(TIMER0_A0_VECTOR))) Timer_A (void)
+void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
 #else
 #error Compiler not supported!
 #endif
 { 
   // This part is used to test that 331 cycles = 1 second by toggling the LED
   if(MovementCyclesCounter == MovementCyclesLimit){
-    P4OUT ^= BIT0; // Led is toggled every 3.02ms (DEBUGGER)
+    P4OUT ^= BIT3; // Led is toggled every 3.02ms (DEBUGGER)
     MovementCyclesCounter = 0;
   }
   else{
@@ -117,10 +117,10 @@ void __attribute__ ((interrupt(TIMER0_A0_VECTOR))) Timer_A (void)
     else if(drive_flag == Reverse) ReverseCycleCounterLimit += 331;
     drive_flag = Stop;                       // Set the flag to "Stop"
     FwdRwdCycle = 0;                         // Reset the cycle counter
-    TA0CCR1 = 0;                             // Set the "DutyCycle" to 0
-    TA0CCR2 = 0;                             // Set the "DutyCycle" to 0
-    TA0CCTL1 = OUTMOD_5;                     // CCR2 reset      P1.7/TA0.1
-    TA0CCTL2 = OUTMOD_5;                     // CCR2 reset      P1.6/TA0.2
+    TA1CCR1 = 0;                             // Set the "DutyCycle" to 0
+    TA1CCR2 = 0;                             // Set the "DutyCycle" to 0
+    TA1CCTL1 = OUTMOD_5;                     // CCR2 reset      P1.7/TA0.1
+    TA1CCTL2 = OUTMOD_5;                     // CCR2 reset      P1.6/TA0.2
   }
   
   if(RLCycle < RLCyclesLimit){
@@ -134,8 +134,8 @@ void __attribute__ ((interrupt(TIMER0_A0_VECTOR))) Timer_A (void)
     else if(steer_flag == Left) LeftCycleCounterLimit += 331;
     steer_flag = Neutral;                    // Set the flag to "Neutral"                
     RLCycle = 0;                             // Reset the cycle counter   
-    P5OUT &= ~(BIT0);                        // Drive P5.0 Low (Left)
-    P1OUT &= ~(BIT5);                        // Drive P1.5 Low (Right)
+    P7OUT &= ~(BIT5);                        // Drive P7.5 Low (Left)
+    P7OUT &= ~(BIT4);                        // Drive P7.4 Low (Right)
   }
 }
 
@@ -143,16 +143,18 @@ int main( void )
 {
   // Stop watchdog timer to prevent time out reset
   WDTCTL = WDTPW | WDTHOLD;                 // Stop WDT
+    
+  P4DIR |= BIT0;     // P4.0 (FWD)
+  P8DIR |= BIT3;     // P8.3 (RWD)
   
-  P1DIR |= BIT5 | BIT6 | BIT7; // P1.6(RWD) and P1.7 (FWD) P1.5(Right) output
-  P1SEL0|= BIT6 | BIT7;              // P1.7 options select
+  P4SEL0 |= BIT0;     // Secondary function PWM output TA1.1
+  P8SEL0 |= BIT3;     // Secondary function PWM output TA1.2
   
-  P5DIR |= BIT0;                     //P5.0(Left) output mode
+  P7DIR |= BIT5 | BIT4;                //P7.5(Left) P7.4(Right) output mode
   
-  P1OUT &= ~BIT5;                    // Drive P1.5 Low (Right)
-  P5OUT &= ~BIT0;                    // Drive P5.0 Low (Left)
+  P7OUT &= ~(BIT4 | BIT5);             // Drive P7.4 Low (Right) P7.5 Low (Left)
   
-  P4SEL0|= BIT1 | BIT2;                   // P4.2~P4.1: crystal pins
+  P4SEL0|= BIT1 | BIT2;                // P4.2~P4.1: crystal pins
   
   // Configure SW1 and SW2 and P1.2
   P1OUT |= BIT2 | BIT3 | BIT4;   // Configure P1.2|P1.3|P1.4 as pulled-up
@@ -167,7 +169,7 @@ int main( void )
   P2IE  |= BIT6;   // P2.6 interrupt enabled
   P2IFG &= ~BIT6;  // Clear interrupt flag of P2.6
   
-  P4DIR |= BIT0; // (DEBUGGER) Used to visualize the movement cycles during the run time
+  P4DIR |= BIT3; // (DEBUGGER) Used to visualize the movement cycles during the run time
   
   // Disable the GPIO power-on default high-impedance mode to activate
   // previously configured port settings
@@ -177,7 +179,7 @@ int main( void )
   PWM_TimerSetup();           // Sets up the timer of the PWM
   PWM_PeriodSetup(PWMPeriod);       // Sets up the period of the PWM
   
-  ADCsetup();                 // Set up the ADC configuration
+//  ADCsetup();                 // Set up the ADC configuration
   
   __bis_SR_register(LPM3_bits|GIE);          // Enter LPM3
   __no_operation();                         // For debugger
