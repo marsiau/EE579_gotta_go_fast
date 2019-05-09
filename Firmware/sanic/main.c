@@ -3,8 +3,9 @@
 #include "IRsens.h"
 
 bool initialised = false;
-int DutyCycle = 70; // The Duty Cycle of the PWMs
-int PWMPeriod = 100; // This defines the value of the CCR0 
+int DutyCycle = 99; // The Duty Cycle of the PWMs
+int PWMPeriod = 100; // This defines the value of the CCR0
+int Vbat = 450; // Battery Voltage Placeholder 
 
 // Movement flags used to determine the status of the car
 enum FwdRwd_flag drive_flag = Stop;
@@ -26,7 +27,7 @@ int scriptcount = -1;
 int scriptselector = -1;
 
 // Debugging variables
-int MovementCyclesLimit = 331; // 1 second = 331 Cycles (DEBUGGING)     
+int MovementCyclesLimit = 83; // 1 second = 331 Cycles (DEBUGGING)     
 int MovementCyclesCounter = 0; // Counts the number of cycles (DEBUGGING)
 
 // Duration of the movements is in seconds (DEBUGGING)
@@ -96,11 +97,27 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
   // This part is used to test that 331 cycles = 1 second by toggling the LED
   if(MovementCyclesCounter == MovementCyclesLimit){
     P4OUT ^= BIT3; // Led is toggled every 3.02ms (DEBUGGER)
+	if(drive_flag == Forward) TA1CCR1 = DutyCycle; // Update duty cycle
+    else if(drive_flag == Reverse) TA1CCR2 = DutyCycle; // Update duty cycle
     MovementCyclesCounter = 0;
   }
   else{
     MovementCyclesCounter++;// Used to toggle LED4.0 every second
   }
+  
+  //--------------------------------------------------
+  // Duty Cycle selector
+  if(running == 0) DutyCycle = 99;
+  else{
+    if(Vbat > 440) DutyCycle = 70;
+    else if(Vbat > 430) DutyCycle = 75;
+    else if(Vbat > 420) DutyCycle = 80;
+    else if(Vbat > 410) DutyCycle = 85;
+    else if(Vbat > 400) DutyCycle = 90;
+    else if(Vbat > 390) DutyCycle = 95;
+    else DutyCycle = 99;
+  }
+  
   //--------------------------------------------------
   //Forward-sensor Script
   switch(scriptselector){
