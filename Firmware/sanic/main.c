@@ -1,9 +1,7 @@
-#include "io430.h"
+//#include "io430.h" -- Included by IRsens
 #include "PWMsetup.h"
+#include "IRsens.h"
 
-typedef int bool;
-#define true 1
-#define false 0
 
 int DutyCycle = 70; // The Duty Cycle of the PWMs
 int PWMPeriod = 100; // This defines the value of the CCR0 
@@ -38,78 +36,7 @@ int LeftCycleCounterLimit = 1 * 331;
 int RightCycleCounterLimit = 1 * 331;
 // ---------------------------
 
-#pragma vector = PORT2_VECTOR
-__interrupt void P2_ISR(void)
-{
-  switch(__even_in_range(P2IV,P2IV_P2IFG7)) //P2.6
-  {
-  case P2IV_P2IFG6: //Back sensor
-    __delay_cycles(5000);    // Debouncing, Wait and then check if P2.6 is still Low
-    if(!(P2IN & BIT6)){
-      StopCar();
-      scriptselector = 2; //Select Back Sensor Script
-      scriptcount = 0;
-      running = 0;
-      P2IFG &= ~BIT6;      
-      break;
-    }
-  }
-}
-#pragma vector = PORT1_VECTOR
-__interrupt void P1_ISR(void)
-{
-  switch(__even_in_range(P1IV,P1IV_P1IFG7)) 
-  {
-  case P1IV_P1IFG2: //Forward-Facing Sensor //P1.2 
-    __delay_cycles(5000);    // Debouncing, Wait and then check if P1.2 is still Low
-    if(!(P1IN & BIT2)){
-      StopCar();
-      scriptselector = 0; //Either 0 or 1 for randomness (Forward right is 0, forward left sensor is 1)
-      scriptcount = 0;
-      running = 0;
-      P1IFG &= ~BIT2;
-      break;
-    }
-    
-  case P1IV_P1IFG3: //It is SW1 // Forward-Left //P1.3
-    __delay_cycles(5000);    // Debouncing, Wait and then check if P1.3 is still Low
-    if(!(P1IN & BIT3)){
-      StopCar();
-      scriptselector = 1; //Select Forward Left Sensor Script
-      scriptcount = 0;
-      running = 0;
-      P1IFG &= ~BIT3;
-      break;
-    }
-  case P1IV_P1IFG4:  //It is SW2 // Forward-Right //P1.4
-    __delay_cycles(5000);    // Debouncing, Wait and then check if P1.4 is still Low
-    if(!(P1IN & BIT4)){
-      StopCar();
-      scriptselector = 0; //Select Forward Right Sensor
-      scriptcount = 0;
-      running = 0;
-      P1IFG &= ~BIT4;      
-      break;
-    }
-  } 
-}
-
-////ADC Interrupt Service Routine
-//#pragma vector=ADC_VECTOR           
-//__interrupt void ADC_ISR(void)
-//{
-//  switch(__even_in_range(ADCIV,ADCIV_ADCIFG))
-//  {
-//  case ADCIV_ADCIFG:              // Ready for a reading
-//    DutyCycle = ADCMEM0 / 10; // Sets up the duty cycle of the PWM
-//    // This updates the speed of the car as soon as a new Duty Cycle value is calculated
-//    if(drive_flag == Forward) TA0CCR1 = DutyCycle; 
-//    else if (drive_flag == Reverse) TA0CCR2 = DutyCycle;
-//    break;
-//  }
-//}
-
-// Timer A0 interrupt service routine CC0
+// Timer1 A0 interrupt service routine CC0
 #if defined(__TI_COMPILER_VERSION__) || defined(__IAR_SYSTEMS_ICC__)
 #pragma vector = TIMER1_A0_VECTOR
 __interrupt void Timer_A (void)
@@ -119,6 +46,7 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
 #error Compiler not supported!
 #endif
 { 
+  IR_scan();
   // This part is used to test that 331 cycles = 1 second by toggling the LED
   if(MovementCyclesCounter == MovementCyclesLimit){
     P4OUT ^= BIT3; // Led is toggled every 3.02ms (DEBUGGER)
@@ -325,22 +253,12 @@ int main( void )
   
   P4SEL0|= BIT1 | BIT2;                // P4.2~P4.1: crystal pins
   
-  // Configure SW1 and SW2 and P1.2
-  P1OUT |= BIT2 | BIT3 | BIT4;   // Configure P1.2|P1.3|P1.4 as pulled-up
-  P1REN |= BIT2 | BIT3 | BIT4;   // P1.2|P1.3|P1.4 pull-up register enable
-  P1IES |= BIT2 | BIT3 | BIT4;   // P1.2|P1.3|P1.4 Hi/Low edge transition
-  P1IE  |= BIT2 | BIT3 | BIT4;   // P1.2|P1.3|P1.4 interrupt enabled
-  P1IFG &= ~(BIT2 | BIT3 | BIT4); // Clear interrupt flag of P1.2|P1.3|P1.4
+  //IRSens Init
+  IR_calibrate();
+  IR_init();
   
-  P2OUT |= BIT6;   // Configure P2.6 as pulled-up
-  P2REN |= BIT6;   // P2.6 pull-up register enable
-  P2IES |= BIT6;   // P2.6 Hi/Low edge transition
-  P2IE  |= BIT6;   // P2.6 interrupt enabled
-  P2IFG &= ~BIT6;  // Clear interrupt flag of P2.6
   
   P4DIR |= BIT3; // (DEBUGGER) Used to visualize the movement cycles during the run time
-  P2DIR |= BIT7;
-  P2OUT &= ~BIT7;
   
   // Disable the GPIO power-on default high-impedance mode to activate
   // previously configured port settings
@@ -352,4 +270,37 @@ int main( void )
   
   __bis_SR_register(LPM3_bits|GIE);          // Enter LPM3
   __no_operation();                         // For debugger
+  while(1)
+  {
+    if(IRSens_flag & 0x20)//1.5 A5 Back (Highest Priority)
+    {
+      StopCar(); //Stop Immediately
+      scriptselector = 2; //Select Back Sensor Script
+      scriptcount = 0; //Reset
+      running = 0; //Not currently running a script (For movement loop logic)
+    }
+    else if(IRSens_flag & 0x4) //1.2 A2 Front-Left
+    {
+      StopCar(); //Stop Immediately
+      scriptselector = 1; //Select Forward Left Sensor Script
+      scriptcount = 0; //Reset
+      running = 0; //Not currently running a script (For movement loop logic)
+    }
+    else if(IRSens_flag & 0x10)//1.4 A4 Front-Right 
+    {
+      StopCar(); //Stop Immediately
+      scriptselector = 0; //Select Forward Right Sensor Script
+      scriptcount = 0; //Reset
+      running = 0; //Not currently running a script (For movement loop logic)
+    }
+    else if(IRSens_flag & 0x8) //1.3 A3 Front (Lowest priority / if only front sensor)
+    {
+      StopCar(); //Stop Immediately
+      scriptselector = 0; //Either 0 or 1 for randomness (Forward right is 0, forward left sensor is 1)
+      scriptcount = 0; //Reset
+      running = 0; //Not currently running a script (For movement loop logic)
+    }
+      __bis_SR_register(LPM3_bits|GIE);          // Enter LPM3
+      __no_operation();                         // For debugger
+  }
 }
