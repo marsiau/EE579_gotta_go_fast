@@ -2,7 +2,7 @@
 #include "PWMsetup.h"
 #include "IRsens.h"
 
-
+bool initialised = false;
 int DutyCycle = 70; // The Duty Cycle of the PWMs
 int PWMPeriod = 100; // This defines the value of the CCR0 
 
@@ -35,6 +35,51 @@ int ReverseCycleCounterLimit = 2 * 331;
 int LeftCycleCounterLimit = 1 * 331;
 int RightCycleCounterLimit = 1 * 331;
 // ---------------------------
+//----- Function declarations -----
+
+void Bump_init();
+
+//----- Global variable declarations -----
+extern uint8_t BumpSwitch_flag = 0;
+
+//--------------- Interrupt routines ---------------
+//----- Interrupt routine for GPIO -----
+#pragma vector = PORT2_VECTOR
+__interrupt void P1_interrupt_handler(void)
+{
+    //Debounce all at once
+    __delay_cycles(5000);                      //Simple debouncing
+    if((P2IN && 0x27) > 1)
+    {
+      switch(__even_in_range(P2IV,P2IV_P2IFG7)){//Checks all pins on P1
+        // Mising break to catch multiple events
+            case P2IV_P2IFG0:
+                BumpSwitch_flag |= 0x01; //Front left
+            case P2IV_P2IFG1:
+                BumpSwitch_flag |= 0x02; //Front
+            case P2IV_P2IFG2:
+                BumpSwitch_flag |= 0x04; //Front right
+            case P2IV_P2IFG5:
+                BumpSwitch_flag |= 0x20; //Back
+            default:
+                break;
+      }
+    }
+}
+
+//--------------- Function declarations ---------------
+void Bump_init()
+{
+    // Init GPIO P2.0-3
+    P2DIR &= ~(BIT0 | BIT1 | BIT2 | BIT3); // Setup as input
+    P2REN |=  (BIT0 | BIT1 | BIT2 | BIT3); // Enable pull up/down resistor
+    P2OUT |=  (BIT0 | BIT1 | BIT2 | BIT3); // Select pull up
+    P2IES |=  (BIT0 | BIT1 | BIT2 | BIT3); // Interrupt on high-to-low transition
+    P2IE  |=  (BIT0 | BIT1 | BIT2 | BIT3); // Interrupt enabled
+    P2IFG &= ~(BIT0 | BIT1 | BIT2 | BIT3); // Interrupt flag cleared
+}
+
+
 
 // Timer1 A0 interrupt service routine CC0
 #if defined(__TI_COMPILER_VERSION__) || defined(__IAR_SYSTEMS_ICC__)
@@ -46,7 +91,8 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
 #error Compiler not supported!
 #endif
 { 
-  IR_scan();
+  if(initialised)
+    IR_scan();
   // This part is used to test that 331 cycles = 1 second by toggling the LED
   if(MovementCyclesCounter == MovementCyclesLimit){
     P4OUT ^= BIT3; // Led is toggled every 3.02ms (DEBUGGER)
@@ -254,7 +300,6 @@ int main( void )
   P4SEL0|= BIT1 | BIT2;                // P4.2~P4.1: crystal pins
   
   //IRSens Init
-  IR_calibrate();
   IR_init();
   
   
@@ -268,37 +313,58 @@ int main( void )
   PWM_TimerSetup();           // Sets up the timer of the PWM
   PWM_PeriodSetup(PWMPeriod);       // Sets up the period of the PWM
   
-  __bis_SR_register(LPM3_bits|GIE);          // Enter LPM3
-  __no_operation();                         // For debugger
-  while(1)
-  {
-    if(IRSens_flag & 0x20)//1.5 A5 Back (Highest Priority)
+while(!initialised)
     {
-      StopCar(); //Stop Immediately
-      scriptselector = 2; //Select Back Sensor Script
-      scriptcount = 0; //Reset
-      running = 0; //Not currently running a script (For movement loop logic)
+      if(BumpSwitch_flag & 0x20) //Back button pressed (Start)
+      {
+        //Do no calibration and just go, pull white_lvl from persistent memory
+        initialised = 1;
+        BumpSwitch_flag = 0;
+      } else if(BumpSwitch_flag & 0x02) //Front button pressed - Calibrate
+      {
+         IR_calibrate();
+         __delay_cycles(5000);
+         BumpSwitch_flag = 0;
+         initialised = 1;
+      }
     }
-    else if(IRSens_flag & 0x4) //1.2 A2 Front-Left
+  while(1)
+  { 
+    if(IRSens_flag & 0x20 | BumpSwitch_flag & 0x20)//1.5 A5 Back (Highest Priority)
+    {
+      StopCar(); //Stop Imm ediately
+      scriptselector = 2; //Select Back Sensor Script(Go forward)
+      scriptcount = 0; //Reset
+      running = 0; //Not currently running a script (For movement loop logic) 
+      IRSens_flag &= ~(0x20); // Reset IRSense Flag now sensor has been dealt with
+      BumpSwitch_flag &= ~(0x20);
+    }
+    else if(IRSens_flag & 0x4 | BumpSwitch_flag & 0x01) //1.2 A2 Front-Left
     {
       StopCar(); //Stop Immediately
       scriptselector = 1; //Select Forward Left Sensor Script
       scriptcount = 0; //Reset
       running = 0; //Not currently running a script (For movement loop logic)
+      IRSens_flag &= ~(0x4 | 0x8); // Reset IRSense Flag now sensor has been dealt with
+      BumpSwitch_flag &= ~(0x01);
     }
-    else if(IRSens_flag & 0x10)//1.4 A4 Front-Right 
+    else if(IRSens_flag & 0x10 | BumpSwitch_flag & 0x04)//1.4 A4 Front-Right 
     {
       StopCar(); //Stop Immediately
       scriptselector = 0; //Select Forward Right Sensor Script
       scriptcount = 0; //Reset
       running = 0; //Not currently running a script (For movement loop logic)
+      IRSens_flag &= ~(0x10 | 0x8); // Reset IRSense Flag now sensor has been dealt with
+      BumpSwitch_flag &= ~(0x04);
     }
-    else if(IRSens_flag & 0x8) //1.3 A3 Front (Lowest priority / if only front sensor)
+    else if(IRSens_flag & 0x8 | BumpSwitch_flag & 0x02) //1.3 A3 Front (Lowest priority / if only front sensor)
     {
       StopCar(); //Stop Immediately
       scriptselector = 0; //Either 0 or 1 for randomness (Forward right is 0, forward left sensor is 1)
       scriptcount = 0; //Reset
       running = 0; //Not currently running a script (For movement loop logic)
+      IRSens_flag &= ~(0x8); // Reset IRSense Flag now sensor has been dealt with
+      BumpSwitch_flag &= ~(0x02);
     }
       __bis_SR_register(LPM3_bits|GIE);          // Enter LPM3
       __no_operation();                         // For debugger
