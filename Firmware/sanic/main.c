@@ -99,7 +99,7 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
     
   // This part is used to test that 331 cycles = 1 second by toggling the LED
   if(MovementCyclesCounter == MovementCyclesLimit){
-    P5OUT ^= BIT3 | BIT4; // Led is toggled every 3.02ms (DEBUGGER)
+    P5OUT ^= BIT4; // Led is toggled every 3.02ms (DEBUGGER)
     if(drive_flag == Forward) TA1CCR1 = DutyCycle; // Update duty cycle
     else if(drive_flag == Reverse) TA1CCR2 = DutyCycle; // Update duty cycle
     MovementCyclesCounter = 0;

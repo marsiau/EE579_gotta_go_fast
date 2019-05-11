@@ -18,7 +18,7 @@ uint16_t Vbat = 0;
 //----- Interrupt routine for ADC -----
 //ADCMEM0 ranges 0 - 1023
 #pragma vector=ADC_VECTOR
-__interrupt void Timer0_A0_ISR(void)
+__interrupt void ADC_ISR(void)
 {
     switch(__even_in_range(ADCIV,ADCIV_ADCIFG))
     {
@@ -76,6 +76,27 @@ __interrupt void Timer0_A0_ISR(void)
     }
 }
 
+// RTC interrupt service routine
+#if defined(__TI_COMPILER_VERSION__) || defined(__IAR_SYSTEMS_ICC__)
+#pragma vector=RTC_VECTOR
+__interrupt void RTC_ISR(void)
+#elif defined(__GNUC__)
+void __attribute__ ((interrupt(RTC_VECTOR))) RTC_ISR (void)
+#else
+#error Compiler not supported!
+#endif
+{
+    switch(__even_in_range(RTCIV,RTCIV_RTCIF))
+    {
+        case  RTCIV_NONE:   break;          // No interrupt
+        case  RTCIV_RTCIF:                  // RTC Overflow
+            P5OUT ^= BIT3;
+            ADCCTL0 |= ADCSC;// Enable conversion
+            break;
+        default: break;
+    }
+}
+
 //--------------- Function declarations ---------------
 //----- Calibrate the white lvl -----
 void IR_calibrate()
@@ -107,26 +128,38 @@ void IR_init()
     //Sample & hold time = 16 ADCCLK cycles | ADC on
     ADCCTL0 |= ADCSHT_2  | ADCON;
     //TA0 trigger | SAMPCON triggered by sampling timer | repeat-sequence-of-channels
-    ADCCTL1 |= ADCSHS_1 | ADCSHP | ADCCONSEQ_3;
+    ADCCTL1 |= ADCSHS_0 | ADCSHP | ADCCONSEQ_1 | ADCSSEL_1;
     //10 bit (10 clock cycle conversion time)
     ADCCTL2 |= ADCRES;
     //Configure ADC mux
-    ADCMCTL0 |= ADCINCH_6;//1001b = A9, 000b = Vr+ = AVCC and Vr- = AVSS
+    ADCMCTL0 |= ADCINCH_5;//1001b = A9, 000b = Vr+ = AVCC and Vr- = AVSS
     //Configure the interrupt
     ADCIFG &= ~(0x01);//Clear interrupt flag
     ADCIE |= ADCIE0;
 
     //----- Configure trigger ADC timer TA0 -----
     //32768 should be around 100Hz atm
-    TA0CTL = TACLR;// Clear the timer.
-    TA0CCR0 =  0x148;// Reset every
-    TA0CCR1 =  0xEE;// Toggle OUT every to turn the ADC on next CCR0 int
-    TA0CCTL1 |= OUTMOD_7;// TA1CCR1 toggle
-    TA0CTL |= TASSEL_1 | ID_0 | MC_0 | TACLR;// ACLK | no clock division | stop | clear
+//    TA0CTL = TACLR;// Clear the timer.
+//    TA0CCR0 =  0x148;// Reset every
+//    TA0CCR1 =  0xEE;// Toggle OUT every to turn the ADC on next CCR0 int
+//    TA0CCTL1 |= OUTMOD_7;// TA1CCR1 toggle
+//    TA0CTL |= TASSEL_1 | ID_0 | MC_0 | TACLR;// ACLK | no clock division | stop | clear
+    
+    //----- Configure RTC to trigger ADC  -----
+    /*
+    Using RTC as we need TA1 for PWM, and there is not connection between TA0 and ADC
+    */
+
+    // Initialize RTC
+    // RTC count re-load compare value at 32.
+    // 1/32768 * 32 = 1 sec.
+//    RTCMOD = 0x1F;
 }
 //----- Start scanning -----
 void IR_scan()
 {
-    TA0CTL |= MC_1;// ACLK, up mode
+//    TA0CTL |= MC_1;// ACLK, up mode
+    RTCMOD = 0x400;
+    RTCCTL |= RTCSS__XT1CLK | RTCSR | RTCPS__1024 | RTCIE ;// | RTCIE;
     ADCCTL0 |= ADCENC;// Enable conversion
 }
