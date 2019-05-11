@@ -50,7 +50,7 @@ extern uint8_t BumpSwitch_flag = 0;
 __interrupt void P1_interrupt_handler(void)
 {
     //Debounce all at once
-    __delay_cycles(5000);                      //Simple debouncing
+    __delay_cycles(10000);                      //Simple debouncing
     if((P2IN && 0x27) >= 0x1)
     {
       switch(__even_in_range(P2IV,P2IV_P2IFG7)){//Checks all pins on P1
@@ -99,7 +99,7 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
     IR_scan();
   // This part is used to test that 331 cycles = 1 second by toggling the LED
   if(MovementCyclesCounter == MovementCyclesLimit){
-    P5OUT ^= BIT3 | BIT4 | BIT5; // Led is toggled every 3.02ms (DEBUGGER)
+    P5OUT ^= BIT3 | BIT4; // Led is toggled every 3.02ms (DEBUGGER)
     if(drive_flag == Forward) TA1CCR1 = DutyCycle; // Update duty cycle
     else if(drive_flag == Reverse) TA1CCR2 = DutyCycle; // Update duty cycle
     MovementCyclesCounter = 0;
@@ -110,9 +110,9 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
 
   //--------------------------------------------------
   // Duty Cycle selector
-  if(running == 0) DutyCycle = 99;
+  if(running == 0) DutyCycle = 60;
   else{
-    if(Vbat > 440) DutyCycle = 99;
+    if(Vbat > 440) DutyCycle = 20;
     else if(Vbat > 430) DutyCycle = 75;
     else if(Vbat > 420) DutyCycle = 80;
     else if(Vbat > 410) DutyCycle = 85;
@@ -128,12 +128,14 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
     switch(scriptcount){
     case 0:
       StopCar();
+      __delay_cycles(10000);
       running = 0;
       scriptcount++;
       break;
     case 1:
       if(!running)
         Drive_RWD(DutyCycle,ReverseCycleCounterLimit);
+        Steer_Right(ReverseCycleCounterLimit);
       running = 1;
       if(drive_flag == Stop){
         scriptcount++;
@@ -142,6 +144,7 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
       break;
     case 2:
       StopCar();
+      __delay_cycles(10000);
       running = 0;
       scriptcount++;
       break;
@@ -174,12 +177,14 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
     switch(scriptcount){
     case 0:
       StopCar();
+      __delay_cycles(10000);
       running = 0;
       scriptcount++;
       break;
     case 1:
       if(!running)
         Drive_RWD(DutyCycle,ReverseCycleCounterLimit);
+        Steer_Left(ReverseCycleCounterLimit);
       running = 1;
       if(drive_flag == Stop){
         scriptcount++;
@@ -188,6 +193,7 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
       break;
     case 2:
       StopCar();
+      __delay_cycles(10000);
       running = 0;
       scriptcount++;
       break;
@@ -239,6 +245,7 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
     P2OUT ^= BIT7;
     switch(scriptcount){
     case 0:
+      __delay_cycles(10000);
       StopCar();
       running = 0;
       scriptcount++;
@@ -334,33 +341,35 @@ int main( void )
   ACLKClockSetup();           // Connects the external oscillator XT1 to ACLK
   PWM_TimerSetup();           // Sets up the timer of the PWM
   PWM_PeriodSetup(PWMPeriod);       // Sets up the period of the PWM
-
+initialised = false;
+BumpSwitch_flag = 0x00;
 while(!initialised)
     {
       if(BumpSwitch_flag & 0x20) //Back button pressed (Start)
       {
         //Do no calibration and just go, pull white_lvl from persistent memory
         initialised = true;
-        BumpSwitch_flag = 0;
+        BumpSwitch_flag = 0x00;
         scriptselector = 2; //Select Back Sensor Script(Go forward)
         scriptcount = 0; //Reset
         running = 0; //Not currently running a script (For movement loop logic)
       } else if(BumpSwitch_flag & 0x02) //Front button pressed - Calibrate
       {
+         P5OUT |= BIT5;
          IR_calibrate();
-         __delay_cycles(5000);
-         BumpSwitch_flag = 0;
-         initialised = true;
-         scriptselector = 2; //Select Back Sensor Script(Go forward)
-         scriptcount = 0; //Reset
-         running = 0; //Not currently running a script (For movement loop logic)
+         __delay_cycles(500000);
+         P5OUT &= ~(BIT5);
+         BumpSwitch_flag = 0x00;
+         //scriptselector = 2; //Select Back Sensor Script(Go forward)
+         //scriptcount = 0; //Reset
+         //running = 0; //Not currently running a script (For movement loop logic)
       }
     }
   while(1)
   {
     if(IRSens_flag & 0x20 | BumpSwitch_flag & 0x20)//1.5 A5 Back (Highest Priority)
     {
-      StopCar(); //Stop Imm ediately
+      StopCar(); //Stop Immediately
       scriptselector = 2; //Select Back Sensor Script(Go forward)
       scriptcount = 0; //Reset
       running = 0; //Not currently running a script (For movement loop logic)
