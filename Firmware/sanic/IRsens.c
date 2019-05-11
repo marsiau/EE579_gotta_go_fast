@@ -91,7 +91,7 @@ void __attribute__ ((interrupt(RTC_VECTOR))) RTC_ISR (void)
         case  RTCIV_NONE:   break;          // No interrupt
         case  RTCIV_RTCIF:                  // RTC Overflow
             P5OUT ^= BIT3;
-            ADCCTL0 |= ADCSC;// Enable conversion
+            //ADCCTL0 |= ADCSC;// Enable conversion
             break;
         default: break;
     }
@@ -126,9 +126,9 @@ void IR_init()
     // Configure pins A2-A5 as ADC inputs
     SYSCFG2 |= ADCPCTL2 | ADCPCTL3 | ADCPCTL4 | ADCPCTL5 | ADCPCTL6;
     //Sample & hold time = 16 ADCCLK cycles | ADC on
-    ADCCTL0 |= ADCSHT_2  | ADCON;
+    ADCCTL0 |= ADCSHT_2  | ADCMSC | ADCON;
     //TA0 trigger | SAMPCON triggered by sampling timer | repeat-sequence-of-channels
-    ADCCTL1 |= ADCSHS_0 | ADCSHP | ADCCONSEQ_1 | ADCSSEL_1;
+    ADCCTL1 |= ADCSHS_1 | ADCSHP | ADCCONSEQ_2 | ADCSSEL_1;
     //10 bit (10 clock cycle conversion time)
     ADCCTL2 |= ADCRES;
     //Configure ADC mux
@@ -152,14 +152,15 @@ void IR_init()
 
     // Initialize RTC
     // RTC count re-load compare value at 32.
-    // 1/32768 * 32 = 1 sec.
-//    RTCMOD = 0x1F;
+    // 1/32768 * 32 = x sec.
+
 }
 //----- Start scanning -----
 void IR_scan()
 {
 //    TA0CTL |= MC_1;// ACLK, up mode
-    RTCMOD = 0x400;
-    RTCCTL |= RTCSS__XT1CLK | RTCSR | RTCPS__1024 | RTCIE ;// | RTCIE;
-    ADCCTL0 |= ADCENC;// Enable conversion
+    //RTCMOD = 0x100;
+    RTCMOD = 0x1F;
+    RTCCTL = RTCSS__XT1CLK | RTCSR | RTCPS__1;  // | RTCIE;
+    ADCCTL0 |= ADCSC | ADCENC;                      // Enable conversion
 }
