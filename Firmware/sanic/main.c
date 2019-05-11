@@ -95,8 +95,8 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
 #error Compiler not supported!
 #endif
 {
-  if(initialised)
-    IR_scan();
+  if(initialised);
+    
   // This part is used to test that 331 cycles = 1 second by toggling the LED
   if(MovementCyclesCounter == MovementCyclesLimit){
     P5OUT ^= BIT3 | BIT4; // Led is toggled every 3.02ms (DEBUGGER)
@@ -348,6 +348,7 @@ int main( void )
       //Do no calibration and just go, pull white_lvl from persistent memory
       //IRSens Init
       IR_init();
+      IR_scan();
       initialised = true;
       BumpSwitch_flag = 0x00;
       scriptselector = 2; //Select Back Sensor Script(Go forward)

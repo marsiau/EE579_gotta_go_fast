@@ -7,7 +7,7 @@
 #include "IRsens.h"
 
 //--------------- Variable definitions ---------------
-const uint8_t ERR = 100;
+const uint8_t ERR = 10;
 bool calib_flag = false;
 uint8_t IRSens_flag = 0; // 0b00 A5 A4 A3 A2 0 0 
 uint16_t white_lvl;
@@ -61,7 +61,7 @@ __interrupt void Timer0_A0_ISR(void)
                         IRSens_flag |= 0x20;
                         break;
                     case 0x6: // A6
-                        Vbat = int(ADCMEM0 * 19 / 13)
+                        Vbat = (int)ADCMEM0 * 19 / 13;
                         break;
                     default:
                         break;
@@ -96,7 +96,7 @@ void IR_calibrate()
     ADCIFG &= ~(0x01);//Clear interrupt flag
     ADCIE |= ADCIE0;// Enable ADC conv complete interrupt
 
-    ADCCTL0 |= ADCENC;//Enable a single conversion
+    ADCCTL0 |= ADCENC | ADCSC;//Enable a single conversion
 }
 //----- Initialise ADC Scan -----
 void IR_init()
