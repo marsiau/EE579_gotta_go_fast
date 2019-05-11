@@ -6,7 +6,7 @@
 bool initialised = false;
 int DutyCycle = 99; // The Duty Cycle of the PWMs
 int PWMPeriod = 100; // This defines the value of the CCR0
-int Vbat = 450; // Battery Voltage Placeholder
+//unsigned int Vbat = 450; // Battery Voltage Placeholder
 
 // Movement flags used to determine the status of the car
 enum FwdRwd_flag drive_flag = Stop;
@@ -49,38 +49,38 @@ extern uint8_t BumpSwitch_flag = 0;
 #pragma vector = PORT2_VECTOR
 __interrupt void P1_interrupt_handler(void)
 {
-    //Debounce all at once
-    __delay_cycles(10000);                      //Simple debouncing
-    if((P2IN && 0x27) >= 0x1)
-    {
-      switch(__even_in_range(P2IV,P2IV_P2IFG7)){//Checks all pins on P1
-        // Mising break to catch multiple events
-            case P2IV_P2IFG0:
-                BumpSwitch_flag |= 0x01; break; //Front left
-            case P2IV_P2IFG1:
-                BumpSwitch_flag |= 0x02; break;//Front
-            case P2IV_P2IFG2:
-                BumpSwitch_flag |= 0x04; break;//Front right
-            case P2IV_P2IFG5:
-                BumpSwitch_flag |= 0x20; break;//Back
-            default:
-                break;
-      }
+  //Debounce all at once
+  __delay_cycles(10000);                      //Simple debouncing
+  if((P2IN && 0x27) >= 0x1)
+  {
+    switch(__even_in_range(P2IV,P2IV_P2IFG7)){//Checks all pins on P1
+      // Mising break to catch multiple events
+    case P2IV_P2IFG0:
+      BumpSwitch_flag |= 0x01; break; //Front left
+    case P2IV_P2IFG1:
+      BumpSwitch_flag |= 0x02; break;//Front
+    case P2IV_P2IFG2:
+      BumpSwitch_flag |= 0x04; break;//Front right
+    case P2IV_P2IFG5:
+      BumpSwitch_flag |= 0x20; break;//Back
+    default:
+      break;
     }
-    __no_operation();
-    __bic_SR_register_on_exit(LPM3_bits);         //Exit LPM3
+  }
+  __no_operation();
+  __bic_SR_register_on_exit(LPM3_bits);         //Exit LPM3
 }
 
 //--------------- Function declarations ---------------
 void Bump_init()
 {
-    // Init GPIO P2.0-3
-    P2DIR &= ~(BIT0 | BIT1 | BIT2 | BIT5); // Setup as input
-    P2REN |=  (BIT0 | BIT1 | BIT2 | BIT5); // Enable pull up/down resistor
-    P2OUT |=  (BIT0 | BIT1 | BIT2 | BIT5); // Select pull up
-    P2IES |=  (BIT0 | BIT1 | BIT2 | BIT5); // Interrupt on high-to-low transition
-    P2IE  |=  (BIT0 | BIT1 | BIT2 | BIT5); // Interrupt enabled
-    P2IFG &= ~(BIT0 | BIT1 | BIT2 | BIT5); // Interrupt flag cleared
+  // Init GPIO P2.0-3
+  P2DIR &= ~(BIT0 | BIT1 | BIT2 | BIT5); // Setup as input
+  P2REN |=  (BIT0 | BIT1 | BIT2 | BIT5); // Enable pull up/down resistor
+  P2OUT |=  (BIT0 | BIT1 | BIT2 | BIT5); // Select pull up
+  P2IES |=  (BIT0 | BIT1 | BIT2 | BIT5); // Interrupt on high-to-low transition
+  P2IE  |=  (BIT0 | BIT1 | BIT2 | BIT5); // Interrupt enabled
+  P2IFG &= ~(BIT0 | BIT1 | BIT2 | BIT5); // Interrupt flag cleared
 }
 
 
@@ -107,20 +107,20 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
   else{
     MovementCyclesCounter++;// Used to toggle LED4.0 every second
   }
-
+  
   //--------------------------------------------------
   // Duty Cycle selector
   if(running == 0) DutyCycle = 60;
   else{
-    if(Vbat > 440) DutyCycle = 20;
-    else if(Vbat > 430) DutyCycle = 75;
-    else if(Vbat > 420) DutyCycle = 80;
-    else if(Vbat > 410) DutyCycle = 85;
-    else if(Vbat > 400) DutyCycle = 90;
-    else if(Vbat > 390) DutyCycle = 95;
+    if(Vbat > 4400) DutyCycle = 20;
+    else if(Vbat > 4300) DutyCycle = 75;
+    else if(Vbat > 4200) DutyCycle = 80;
+    else if(Vbat > 4100) DutyCycle = 85;
+    else if(Vbat > 4000) DutyCycle = 90;
+    else if(Vbat > 3900) DutyCycle = 95;
     else DutyCycle = 99;
   }
-
+  
   //--------------------------------------------------
   //Forward-sensor Script
   switch(scriptselector){
@@ -135,7 +135,7 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
     case 1:
       if(!running)
         Drive_RWD(DutyCycle,ReverseCycleCounterLimit);
-        Steer_Right(ReverseCycleCounterLimit);
+      Steer_Right(ReverseCycleCounterLimit);
       running = 1;
       if(drive_flag == Stop){
         scriptcount++;
@@ -184,7 +184,7 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
     case 1:
       if(!running)
         Drive_RWD(DutyCycle,ReverseCycleCounterLimit);
-        Steer_Left(ReverseCycleCounterLimit);
+      Steer_Left(ReverseCycleCounterLimit);
       running = 1;
       if(drive_flag == Stop){
         scriptcount++;
@@ -271,7 +271,7 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
     }
     break;
   }
-
+  
   if(FwdRwdCycle < FwdRwdCyclesLimit){
     if(drive_flag != Stop){
       // If the cycle limit has not been reached and the status flag is not "Stop" then increment the Cycle counter
@@ -288,7 +288,7 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
     TA1CCTL1 = OUTMOD_5;                     // CCR2 reset      P1.7/TA0.1
     TA1CCTL2 = OUTMOD_5;                     // CCR2 reset      P1.6/TA0.2
   }
-
+  
   if(RLCycle < RLCyclesLimit){
     if(steer_flag != Neutral){
       // If the cycle limit has not been reached and the status flag is not "Neutral" then increment the Cycle counter
@@ -313,58 +313,58 @@ int main( void )
 {
   // Stop watchdog timer to prevent time out reset
   WDTCTL = WDTPW | WDTHOLD;                 // Stop WDT
-
+  
   P4DIR |= BIT0;     // P4.0 (FWD)
   P8DIR |= BIT3;     // P8.3 (RWD)
-
+  
   P4SEL0 |= BIT0;     // Secondary function PWM output TA1.1
   P8SEL0 |= BIT3;     // Secondary function PWM output TA1.2
-
+  
   P7DIR |= BIT5 | BIT4;                //P7.5(Left) P7.4(Right) output mode
-
+  
   P7OUT &= ~(BIT4 | BIT5);             // Drive P7.4 Low (Right) P7.5 Low (Left)
-
+  
   P4SEL0|= BIT1 | BIT2;                // P4.2~P4.1: crystal pins
-
+  
   //Bump_sensor Init
   Bump_init();
-  //IRSens Init
-  IR_init();
-  __enable_interrupt();
-
+  
   P5DIR |= BIT5 | BIT4 | BIT3; // (DEBUGGER) Used to visualize the movement cycles during the run time
-
+  
   // Disable the GPIO power-on default high-impedance mode to activate
   // previously configured port settings
   PM5CTL0 &= ~LOCKLPM5;
-
+  
   ACLKClockSetup();           // Connects the external oscillator XT1 to ACLK
   PWM_TimerSetup();           // Sets up the timer of the PWM
   PWM_PeriodSetup(PWMPeriod);       // Sets up the period of the PWM
-initialised = false;
-BumpSwitch_flag = 0x00;
-while(!initialised)
+  initialised = false;
+  BumpSwitch_flag = 0x00;
+  __enable_interrupt();
+  while(!initialised)
+  {
+    if(BumpSwitch_flag & 0x20) //Back button pressed (Start)
     {
-      if(BumpSwitch_flag & 0x20) //Back button pressed (Start)
-      {
-        //Do no calibration and just go, pull white_lvl from persistent memory
-        initialised = true;
-        BumpSwitch_flag = 0x00;
-        scriptselector = 2; //Select Back Sensor Script(Go forward)
-        scriptcount = 0; //Reset
-        running = 0; //Not currently running a script (For movement loop logic)
-      } else if(BumpSwitch_flag & 0x02) //Front button pressed - Calibrate
-      {
-         P5OUT |= BIT5;
-         IR_calibrate();
-         __delay_cycles(500000);
-         P5OUT &= ~(BIT5);
-         BumpSwitch_flag = 0x00;
-         //scriptselector = 2; //Select Back Sensor Script(Go forward)
-         //scriptcount = 0; //Reset
-         //running = 0; //Not currently running a script (For movement loop logic)
-      }
+      //Do no calibration and just go, pull white_lvl from persistent memory
+      //IRSens Init
+      IR_init();
+      initialised = true;
+      BumpSwitch_flag = 0x00;
+      scriptselector = 2; //Select Back Sensor Script(Go forward)
+      scriptcount = 0; //Reset
+      running = 0; //Not currently running a script (For movement loop logic)
+    } else if(BumpSwitch_flag & 0x02) //Front button pressed - Calibrate
+    {
+      P5OUT |= BIT5;
+      IR_calibrate();
+      __delay_cycles(500000);
+      P5OUT &= ~(BIT5);
+      BumpSwitch_flag = 0x00;
+      //scriptselector = 2; //Select Back Sensor Script(Go forward)
+      //scriptcount = 0; //Reset
+      //running = 0; //Not currently running a script (For movement loop logic)
     }
+  }
   while(1)
   {
     if(IRSens_flag & 0x20 | BumpSwitch_flag & 0x20)//1.5 A5 Back (Highest Priority)
@@ -403,7 +403,7 @@ while(!initialised)
       IRSens_flag &= ~(0x8); // Reset IRSense Flag now sensor has been dealt with
       BumpSwitch_flag &= ~(0x02);
     }
-      __bis_SR_register(LPM3_bits|GIE);          // Enter LPM3
-      __no_operation();                         // For debugger
+    __bis_SR_register(LPM3_bits|GIE);          // Enter LPM3
+    __no_operation();                         // For debugger
   }
 }
