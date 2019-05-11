@@ -28,7 +28,7 @@ extern const uint8_t ERR; //Define ADC error margin
 // Global variables
 extern bool calib_flag;//Calibration flag
 extern uint8_t IRSens_flag;
-
+extern uint16_t Vbat;
 //----- Function declarations -----
 void IR_calibrate();//Calibrate the threshold value
 void IR_init();//Setup ADC & timer for A9 (P8.1) only

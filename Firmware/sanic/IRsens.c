@@ -12,6 +12,7 @@ bool calib_flag = false;
 uint8_t IRSens_flag = 0; // 0b00 A5 A4 A3 A2 0 0 
 uint16_t white_lvl;
 uint16_t ADC_chnl;
+uint16_t Vbat = 0;
 
 //--------------- Interrupt routines ---------------
 //----- Interrupt routine for ADC -----
@@ -59,9 +60,9 @@ __interrupt void Timer0_A0_ISR(void)
                     case 0x5: // A5 / 1.5
                         IRSens_flag |= 0x20;
                         break;
-                    //case 0x6: // A6
-                        //store Vbat
-                        //break;
+                    case 0x6: // A6
+                        Vbat = int(ADCMEM0 * 19 / 13)
+                        break;
                     default:
                         break;
                 }
@@ -102,7 +103,7 @@ void IR_init()
 {
     //Init GPIO pins used for ADC
     // Configure pins A2-A5 as ADC inputs
-    SYSCFG2 |= ADCPCTL2 | ADCPCTL3 | ADCPCTL4 | ADCPCTL5;
+    SYSCFG2 |= ADCPCTL2 | ADCPCTL3 | ADCPCTL4 | ADCPCTL5 | ADCPCTL6;
     //Sample & hold time = 16 ADCCLK cycles | ADC on
     ADCCTL0 |= ADCSHT_2  | ADCON;
     //TA0 trigger | SAMPCON triggered by sampling timer | repeat-sequence-of-channels
@@ -110,7 +111,7 @@ void IR_init()
     //10 bit (10 clock cycle conversion time)
     ADCCTL2 |= ADCRES;
     //Configure ADC mux
-    ADCMCTL0 |= ADCINCH_5;//1001b = A9, 000b = Vr+ = AVCC and Vr- = AVSS
+    ADCMCTL0 |= ADCINCH_6;//1001b = A9, 000b = Vr+ = AVCC and Vr- = AVSS
     //Configure the interrupt
     ADCIFG &= ~(0x01);//Clear interrupt flag
     ADCIE |= ADCIE0;
