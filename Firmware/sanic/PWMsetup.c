@@ -37,8 +37,8 @@ void StopCar(){		                   // Stops the car
   steer_flag = Neutral;
 }
 
-void Drive_FWD(int DutyCycle, int CyclesLimit){ // Moves the car forward with a duty cycle given by "DutyCycle"
-  drive_flag = Forward;                    // Overwrites the global drive flag
+void Drive_RWD(int DutyCycle, int CyclesLimit){ // Moves the car forward with a duty cycle given by "DutyCycle"
+  drive_flag = Reverse;                    // Overwrites the global drive flag
   FwdRwdCyclesLimit = CyclesLimit;         // Overwrites the global cycle limit
   FwdRwdCycle = 0;                         // Resets the global cycle counter
   TA1CCR1 = DutyCycle;                     
@@ -47,8 +47,8 @@ void Drive_FWD(int DutyCycle, int CyclesLimit){ // Moves the car forward with a 
   TA1CCTL2 = OUTMOD_5;                     // CCR2 reset      P8.3/TA1.2 RWD
 }
 
-void Drive_RWD(int DutyCycle, int CyclesLimit){    // Moves the car backwards with a duty cycle given by "DutyCycle"
-  drive_flag = Reverse;                    // Overwrites the global drive flag
+void Drive_FWD(int DutyCycle, int CyclesLimit){    // Moves the car backwards with a duty cycle given by "DutyCycle"
+  drive_flag = Forward;                    // Overwrites the global drive flag
   FwdRwdCyclesLimit = CyclesLimit;         // Overwrites the global cycle limit
   FwdRwdCycle = 0;                         // Resets the global cycle counter
   TA1CCR1 = 0;                             // Set the "DutyCycle" to 0

@@ -50,34 +50,36 @@ __interrupt void P1_interrupt_handler(void)
 {
     //Debounce all at once
     __delay_cycles(5000);                      //Simple debouncing
-    if((P2IN && 0x27) > 1)
+    if((P2IN && 0x27) >= 0x1)
     {
       switch(__even_in_range(P2IV,P2IV_P2IFG7)){//Checks all pins on P1
         // Mising break to catch multiple events
             case P2IV_P2IFG0:
-                BumpSwitch_flag |= 0x01; //Front left
+                BumpSwitch_flag |= 0x01; break; //Front left
             case P2IV_P2IFG1:
-                BumpSwitch_flag |= 0x02; //Front
+                BumpSwitch_flag |= 0x02; break;//Front
             case P2IV_P2IFG2:
-                BumpSwitch_flag |= 0x04; //Front right
+                BumpSwitch_flag |= 0x04; break;//Front right
             case P2IV_P2IFG5:
-                BumpSwitch_flag |= 0x20; //Back
+                BumpSwitch_flag |= 0x20; break;//Back
             default:
                 break;
       }
     }
+    __no_operation();
+    __bic_SR_register_on_exit(LPM3_bits);         //Exit LPM3
 }
 
 //--------------- Function declarations ---------------
 void Bump_init()
 {
     // Init GPIO P2.0-3
-    P2DIR &= ~(BIT0 | BIT1 | BIT2 | BIT3); // Setup as input
-    P2REN |=  (BIT0 | BIT1 | BIT2 | BIT3); // Enable pull up/down resistor
-    P2OUT |=  (BIT0 | BIT1 | BIT2 | BIT3); // Select pull up
-    P2IES |=  (BIT0 | BIT1 | BIT2 | BIT3); // Interrupt on high-to-low transition
-    P2IE  |=  (BIT0 | BIT1 | BIT2 | BIT3); // Interrupt enabled
-    P2IFG &= ~(BIT0 | BIT1 | BIT2 | BIT3); // Interrupt flag cleared
+    P2DIR &= ~(BIT0 | BIT1 | BIT2 | BIT5); // Setup as input
+    P2REN |=  (BIT0 | BIT1 | BIT2 | BIT5); // Enable pull up/down resistor
+    P2OUT |=  (BIT0 | BIT1 | BIT2 | BIT5); // Select pull up
+    P2IES |=  (BIT0 | BIT1 | BIT2 | BIT5); // Interrupt on high-to-low transition
+    P2IE  |=  (BIT0 | BIT1 | BIT2 | BIT5); // Interrupt enabled
+    P2IFG &= ~(BIT0 | BIT1 | BIT2 | BIT5); // Interrupt flag cleared
 }
 
 
@@ -96,7 +98,7 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
     IR_scan();
   // This part is used to test that 331 cycles = 1 second by toggling the LED
   if(MovementCyclesCounter == MovementCyclesLimit){
-    P4OUT ^= BIT3; // Led is toggled every 3.02ms (DEBUGGER)
+    P5OUT ^= BIT3 | BIT4 | BIT5; // Led is toggled every 3.02ms (DEBUGGER)
 	if(drive_flag == Forward) TA1CCR1 = DutyCycle; // Update duty cycle
     else if(drive_flag == Reverse) TA1CCR2 = DutyCycle; // Update duty cycle
     MovementCyclesCounter = 0;
@@ -316,11 +318,13 @@ int main( void )
   
   P4SEL0|= BIT1 | BIT2;                // P4.2~P4.1: crystal pins
   
+  //Bump_sensor Init
+  Bump_init();
   //IRSens Init
   IR_init();
+  __enable_interrupt();
   
-  
-  P4DIR |= BIT3; // (DEBUGGER) Used to visualize the movement cycles during the run time
+  P5DIR |= BIT5 | BIT4 | BIT3; // (DEBUGGER) Used to visualize the movement cycles during the run time
   
   // Disable the GPIO power-on default high-impedance mode to activate
   // previously configured port settings
@@ -337,12 +341,18 @@ while(!initialised)
         //Do no calibration and just go, pull white_lvl from persistent memory
         initialised = 1;
         BumpSwitch_flag = 0;
+        scriptselector = 2; //Select Back Sensor Script(Go forward)
+        scriptcount = 0; //Reset
+        running = 0; //Not currently running a script (For movement loop logic) 
       } else if(BumpSwitch_flag & 0x02) //Front button pressed - Calibrate
       {
          IR_calibrate();
          __delay_cycles(5000);
          BumpSwitch_flag = 0;
          initialised = 1;
+         scriptselector = 2; //Select Back Sensor Script(Go forward)
+         scriptcount = 0; //Reset
+         running = 0; //Not currently running a script (For movement loop logic) 
       }
     }
   while(1)
