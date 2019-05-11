@@ -61,14 +61,14 @@ void Steer_Left(int CyclesLimit){	    // Steers the car Left
   steer_flag = Left;                        // Overwrites the global steer flag
   RLCyclesLimit = CyclesLimit;              // Overwrites the global cycle limit
   RLCycle = 0;                              // Resets the global cycle counter  
-  P7OUT |=  BIT5;                             
-  P7OUT &= ~BIT4;                           
+  P7OUT |=  BIT4;
+  P7OUT &= ~BIT5;
 }
 
 void Steer_Right(int CyclesLimit){	    // Steers the car Right
   steer_flag = Right;                       // Overwrites the global steer flag
   RLCyclesLimit = CyclesLimit;              // Overwrites the global cycle limit
   RLCycle = 0;                              // Resets the global cycle counter
-  P7OUT &= ~BIT5;  
-  P7OUT |=  BIT4;
+  P7OUT &= ~BIT4;
+  P7OUT |=  BIT5;
 }

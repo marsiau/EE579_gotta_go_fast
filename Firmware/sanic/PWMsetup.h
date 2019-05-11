@@ -1,4 +1,4 @@
-#include "io430.h"
+#include <msp430.h>
 
 enum FwdRwd_flag {Stop,Forward,Reverse};
 enum LR_flag {Neutral,Right,Left};

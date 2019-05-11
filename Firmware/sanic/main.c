@@ -2,10 +2,11 @@
 #include "PWMsetup.h"
 #include "IRsens.h"
 
+
 bool initialised = false;
 int DutyCycle = 99; // The Duty Cycle of the PWMs
 int PWMPeriod = 100; // This defines the value of the CCR0
-int Vbat = 450; // Battery Voltage Placeholder 
+int Vbat = 450; // Battery Voltage Placeholder
 
 // Movement flags used to determine the status of the car
 enum FwdRwd_flag drive_flag = Stop;
@@ -27,14 +28,14 @@ int scriptcount = -1;
 int scriptselector = -1;
 
 // Debugging variables
-int MovementCyclesLimit = 83; // 1 second = 331 Cycles (DEBUGGING)     
+int MovementCyclesLimit = 83; // 1 second = 331 Cycles (DEBUGGING)
 int MovementCyclesCounter = 0; // Counts the number of cycles (DEBUGGING)
 
 // Duration of the movements is in seconds (DEBUGGING)
-int ForwardCycleCounterLimit =  2 * 331;
-int ReverseCycleCounterLimit = 2 * 331;
-int LeftCycleCounterLimit = 1 * 331;
-int RightCycleCounterLimit = 1 * 331;
+int ForwardCycleCounterLimit =  3 * 83;
+int ReverseCycleCounterLimit = 3 * 83; //331 is 1s, 83 = 0.25ss
+int LeftCycleCounterLimit = 3 * 83;
+int RightCycleCounterLimit = 3 * 83;
 // ---------------------------
 //----- Function declarations -----
 
@@ -93,25 +94,25 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
 #else
 #error Compiler not supported!
 #endif
-{ 
+{
   if(initialised)
     IR_scan();
   // This part is used to test that 331 cycles = 1 second by toggling the LED
   if(MovementCyclesCounter == MovementCyclesLimit){
     P5OUT ^= BIT3 | BIT4 | BIT5; // Led is toggled every 3.02ms (DEBUGGER)
-	if(drive_flag == Forward) TA1CCR1 = DutyCycle; // Update duty cycle
+    if(drive_flag == Forward) TA1CCR1 = DutyCycle; // Update duty cycle
     else if(drive_flag == Reverse) TA1CCR2 = DutyCycle; // Update duty cycle
     MovementCyclesCounter = 0;
   }
   else{
     MovementCyclesCounter++;// Used to toggle LED4.0 every second
   }
-  
+
   //--------------------------------------------------
   // Duty Cycle selector
   if(running == 0) DutyCycle = 99;
   else{
-    if(Vbat > 440) DutyCycle = 70;
+    if(Vbat > 440) DutyCycle = 99;
     else if(Vbat > 430) DutyCycle = 75;
     else if(Vbat > 420) DutyCycle = 80;
     else if(Vbat > 410) DutyCycle = 85;
@@ -119,7 +120,7 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
     else if(Vbat > 390) DutyCycle = 95;
     else DutyCycle = 99;
   }
-  
+
   //--------------------------------------------------
   //Forward-sensor Script
   switch(scriptselector){
@@ -167,7 +168,7 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
       }
       break;
     default: scriptcount = 0; scriptselector = 3; break;
-    } 
+    }
     break;
   case 1: //Forward-Left Sensor
     switch(scriptcount){
@@ -234,7 +235,7 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
     default: running = 0; scriptcount = 0; break;
     }
     break;
-  case 3: //Compensate Steering
+  case 3: //Compensate Steerings
     P2OUT ^= BIT7;
     switch(scriptcount){
     case 0:
@@ -246,11 +247,11 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
       if(!running){
         if((LCycles - RCycles) > 0) {
           Steer_Right((LCycles - RCycles));
-          Drive_FWD(DutyCycle,(LCycles - RCycles)); 
+          Drive_FWD(DutyCycle,(LCycles - RCycles));
         }
         else {
           Steer_Left((RCycles - LCycles));
-          Drive_FWD(DutyCycle,(RCycles - LCycles)); 
+          Drive_FWD(DutyCycle,(RCycles - LCycles));
         }
       }
       running = 1;
@@ -263,11 +264,11 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
     }
     break;
   }
-   
+
   if(FwdRwdCycle < FwdRwdCyclesLimit){
     if(drive_flag != Stop){
       // If the cycle limit has not been reached and the status flag is not "Stop" then increment the Cycle counter
-      FwdRwdCycle++; 
+      FwdRwdCycle++;
     }
   }
   else{ // When cycle limit is reached stop driving
@@ -280,7 +281,7 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
     TA1CCTL1 = OUTMOD_5;                     // CCR2 reset      P1.7/TA0.1
     TA1CCTL2 = OUTMOD_5;                     // CCR2 reset      P1.6/TA0.2
   }
-  
+
   if(RLCycle < RLCyclesLimit){
     if(steer_flag != Neutral){
       // If the cycle limit has not been reached and the status flag is not "Neutral" then increment the Cycle counter
@@ -294,10 +295,10 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
   else{
     if(steer_flag == Right);
     else if(steer_flag == Left);
-    steer_flag = Neutral;                    // Set the flag to "Neutral"                
-    RLCycle = 0;                             // Reset the cycle counter   
-    P7OUT &= ~(BIT5);                        // Drive P7.5 Low (Left)
-    P7OUT &= ~(BIT4);                        // Drive P7.4 Low (Right)
+    steer_flag = Neutral;                    // Set the flag to "Neutral"
+    RLCycle = 0;                             // Reset the cycle counter
+    P7OUT &= ~(BIT5);                        // Drive P7.5 Low (Right)
+    P7OUT &= ~(BIT4);                        // Drive P7.4 Low (Left)
   }
 }
 
@@ -305,64 +306,64 @@ int main( void )
 {
   // Stop watchdog timer to prevent time out reset
   WDTCTL = WDTPW | WDTHOLD;                 // Stop WDT
-  
+
   P4DIR |= BIT0;     // P4.0 (FWD)
   P8DIR |= BIT3;     // P8.3 (RWD)
-  
+
   P4SEL0 |= BIT0;     // Secondary function PWM output TA1.1
   P8SEL0 |= BIT3;     // Secondary function PWM output TA1.2
-  
+
   P7DIR |= BIT5 | BIT4;                //P7.5(Left) P7.4(Right) output mode
-  
+
   P7OUT &= ~(BIT4 | BIT5);             // Drive P7.4 Low (Right) P7.5 Low (Left)
-  
+
   P4SEL0|= BIT1 | BIT2;                // P4.2~P4.1: crystal pins
-  
+
   //Bump_sensor Init
   Bump_init();
   //IRSens Init
   IR_init();
   __enable_interrupt();
-  
+
   P5DIR |= BIT5 | BIT4 | BIT3; // (DEBUGGER) Used to visualize the movement cycles during the run time
-  
+
   // Disable the GPIO power-on default high-impedance mode to activate
   // previously configured port settings
   PM5CTL0 &= ~LOCKLPM5;
-  
+
   ACLKClockSetup();           // Connects the external oscillator XT1 to ACLK
   PWM_TimerSetup();           // Sets up the timer of the PWM
   PWM_PeriodSetup(PWMPeriod);       // Sets up the period of the PWM
-  
+
 while(!initialised)
     {
       if(BumpSwitch_flag & 0x20) //Back button pressed (Start)
       {
         //Do no calibration and just go, pull white_lvl from persistent memory
-        initialised = 1;
+        initialised = true;
         BumpSwitch_flag = 0;
         scriptselector = 2; //Select Back Sensor Script(Go forward)
         scriptcount = 0; //Reset
-        running = 0; //Not currently running a script (For movement loop logic) 
+        running = 0; //Not currently running a script (For movement loop logic)
       } else if(BumpSwitch_flag & 0x02) //Front button pressed - Calibrate
       {
          IR_calibrate();
          __delay_cycles(5000);
          BumpSwitch_flag = 0;
-         initialised = 1;
+         initialised = true;
          scriptselector = 2; //Select Back Sensor Script(Go forward)
          scriptcount = 0; //Reset
-         running = 0; //Not currently running a script (For movement loop logic) 
+         running = 0; //Not currently running a script (For movement loop logic)
       }
     }
   while(1)
-  { 
+  {
     if(IRSens_flag & 0x20 | BumpSwitch_flag & 0x20)//1.5 A5 Back (Highest Priority)
     {
       StopCar(); //Stop Imm ediately
       scriptselector = 2; //Select Back Sensor Script(Go forward)
       scriptcount = 0; //Reset
-      running = 0; //Not currently running a script (For movement loop logic) 
+      running = 0; //Not currently running a script (For movement loop logic)
       IRSens_flag &= ~(0x20); // Reset IRSense Flag now sensor has been dealt with
       BumpSwitch_flag &= ~(0x20);
     }
@@ -375,7 +376,7 @@ while(!initialised)
       IRSens_flag &= ~(0x4 | 0x8); // Reset IRSense Flag now sensor has been dealt with
       BumpSwitch_flag &= ~(0x01);
     }
-    else if(IRSens_flag & 0x10 | BumpSwitch_flag & 0x04)//1.4 A4 Front-Right 
+    else if(IRSens_flag & 0x10 | BumpSwitch_flag & 0x04)//1.4 A4 Front-Right
     {
       StopCar(); //Stop Immediately
       scriptselector = 0; //Select Forward Right Sensor Script
