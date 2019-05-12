@@ -1,4 +1,4 @@
-//#include "io430.h" -- Included by IRsens
+//#include <msp430.h> --included by irsense
 #include "PWMsetup.h"
 #include "IRsens.h"
 
@@ -314,9 +314,9 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
     if(steer_flag != Neutral){
       // If the cycle limit has not been reached and the status flag is not "Neutral" then increment the Cycle counter
       RLCycle++;
-      if(steer_flag == Left)
+      if((steer_flag == Left && drive_flag = Forward) || (steer_flag == Right && drive_flag = Reverse))
         LCycles++;
-      else
+      else if((steer_flag == Right && drive_flag = Forward) || (steer_flag == Left && drive_flag = Reverse))
         RCycles++;
     }
   }
@@ -349,8 +349,8 @@ int main( void )
   P7OUT &= ~(BIT4 | BIT5);             // Drive P7.4 Low (Right) P7.5 Low (Left)
 
   P4SEL0|= BIT1 | BIT2;                // P4.2~P4.1: crystal pins
-  
-  
+
+
   RTC_init(); // RTC Init
   //Bump_sensor Init
   Bump_init();
@@ -420,7 +420,10 @@ int main( void )
     else if(IRSens_flag & 0x8 | BumpSwitch_flag & 0x02) //1.3 A3 Front (Lowest priority / if only front sensor)
     {
       StopCar(); //Stop Immediately
-      scriptselector = 0; //Either 0 or 1 for randomness (Forward right is 0, forward left sensor is 1)
+      if(LCycles >= RCycles)
+          scriptselector = 1; //Either 0 or 1 for randomness (Forward right is 0, forward left sensor is 1)
+      else
+          scriptselector = 0;
       scriptcount = 0; //Reset
       running = 0; //Not currently running a script (For movement loop logic)
       IRSens_flag &= ~(0x8); // Reset IRSense Flag now sensor has been dealt with
