@@ -7,7 +7,6 @@ bool initialised = false;
 int DutyCycle = 99; // The Duty Cycle of the PWMs
 int PWMPeriod = 100; // This defines the value of the CCR0
 //unsigned int Vbat = 450; // Battery Voltage Placeholder
-
 // Movement flags used to determine the status of the car
 enum FwdRwd_flag drive_flag = Stop;
 enum LR_flag steer_flag = Neutral;
@@ -42,7 +41,7 @@ int RightCycleCounterLimit = 3 * 83;
 void Bump_init();
 
 //----- Global variable declarations -----
-extern uint8_t BumpSwitch_flag = 0;
+extern uint8_t BumpSwitch_flag = 0x00;
 
 //--------------- Interrupt routines ---------------
 //----- Interrupt routine for GPIO -----
@@ -313,6 +312,9 @@ int main( void )
 {
   // Stop watchdog timer to prevent time out reset
   WDTCTL = WDTPW | WDTHOLD;                 // Stop WDT
+  // Disable the GPIO power-on default high-impedance mode to activate
+  // previously configured port settings
+  PM5CTL0 &= ~LOCKLPM5;
   
   P4DIR |= BIT0;     // P4.0 (FWD)
   P8DIR |= BIT3;     // P8.3 (RWD)
@@ -330,30 +332,26 @@ int main( void )
   Bump_init();
   
   P5DIR |= BIT5 | BIT4 | BIT3; // (DEBUGGER) Used to visualize the movement cycles during the run time
-  
-  // Disable the GPIO power-on default high-impedance mode to activate
-  // previously configured port settings
-  PM5CTL0 &= ~LOCKLPM5;
-  
+
   ACLKClockSetup();           // Connects the external oscillator XT1 to ACLK
   PWM_TimerSetup();           // Sets up the timer of the PWM
   PWM_PeriodSetup(PWMPeriod);       // Sets up the period of the PWM
-  initialised = false;
-  BumpSwitch_flag = 0x00;
+  //initialised = false;
+  //BumpSwitch_flag = 0x00;
   __enable_interrupt();
   while(!initialised)
   {
     if(BumpSwitch_flag & 0x20) //Back button pressed (Start)
     {
-      //Do no calibration and just go, pull white_lvl from persistent memory
-      //IRSens Init
-      IR_init();
-      IR_scan();
-      initialised = true;
-      BumpSwitch_flag = 0x00;
-      scriptselector = 2; //Select Back Sensor Script(Go forward)
-      scriptcount = 0; //Reset
-      running = 0; //Not currently running a script (For movement loop logic)
+        //Do no calibration and just go, pull white_lvl from persistent memory
+        initialised = true;
+        //IRSens Init
+        IR_init();
+        IR_scan();
+        BumpSwitch_flag = 0x00;
+        scriptselector = 2; //Select Back Sensor Script(Go forward)
+        scriptcount = 0; //Reset
+        running = 0; //Not currently running a script (For movement loop logic)
     } else if(BumpSwitch_flag & 0x02) //Front button pressed - Calibrate
     {
       P5OUT |= BIT5;

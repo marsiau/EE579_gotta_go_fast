@@ -35,6 +35,7 @@ __interrupt void ADC_ISR(void)
         case ADCIV_ADCINIFG://window comparator interrupt
             break;
         case ADCIV_ADCIFG:
+        {
             if(calib_flag)
             {
                 //Store the value
@@ -45,7 +46,9 @@ __interrupt void ADC_ISR(void)
             }
             else if(ADCMEM0 > white_lvl)
             {
-                ADC_chnl = ADCMCTL0 && 0xF; //Extract ADCINCHx
+                //ADC_chnl = (int)(ADCMCTL0 && 0xF); //Extract ADCINCHx
+                //ADC_chnl = (uint16_t) (ADCMCTL0 & 0xF); //Extract ADCINCHx
+                ADC_chnl = (uint16_t) (ADCMCTL0 & 0xF); //Extract ADCINCHx
                 switch(ADC_chnl)
                 {
                     case 0x2: // A2 / 1.2
@@ -60,9 +63,9 @@ __interrupt void ADC_ISR(void)
                     case 0x5: // A5 / 1.5
                         IRSens_flag |= 0x20;
                         break;
-                    case 0x6: // A6
-                        Vbat = (int)ADCMEM0 * 19 / 13;
-                        break;
+                    //case 0x6: // A6
+                      //  Vbat = (int)ADCMEM0 * 19 / 13;
+                        //break;
                     default:
                         break;
                 }
@@ -70,7 +73,9 @@ __interrupt void ADC_ISR(void)
                 __no_operation();
                 __bic_SR_register_on_exit(LPM3_bits);         //Exit LPM3
             }
+            ADCIFG = 0;
             break;
+        }
         default:
             break;
     }
@@ -122,6 +127,7 @@ void IR_calibrate()
 //----- Initialise ADC Scan -----
 void IR_init()
 {
+    /*
     //Init GPIO pins used for ADC
     // Configure pins A2-A5 as ADC inputs
     SYSCFG2 |= ADCPCTL2 | ADCPCTL3 | ADCPCTL4 | ADCPCTL5 | ADCPCTL6;
@@ -136,31 +142,64 @@ void IR_init()
     //Configure the interrupt
     ADCIFG &= ~(0x01);//Clear interrupt flag
     ADCIE |= ADCIE0;
-
-    //----- Configure trigger ADC timer TA0 -----
-    //32768 should be around 100Hz atm
-//    TA0CTL = TACLR;// Clear the timer.
-//    TA0CCR0 =  0x148;// Reset every
-//    TA0CCR1 =  0xEE;// Toggle OUT every to turn the ADC on next CCR0 int
-//    TA0CCTL1 |= OUTMOD_7;// TA1CCR1 toggle
-//    TA0CTL |= TASSEL_1 | ID_0 | MC_0 | TACLR;// ACLK | no clock division | stop | clear
-    
-    //----- Configure RTC to trigger ADC  -----
-    /*
-    Using RTC as we need TA1 for PWM, and there is not connection between TA0 and ADC
     */
+     /*
+     // with RTC
+    ADCCTL0 &= ~ADCENC; //Turn off ADC
+    //Init GPIO pins used for ADC
+    // Configure pins A2-A5 as ADC inputs
+    SYSCFG2 |= ADCPCTL2 | ADCPCTL3 | ADCPCTL4 | ADCPCTL5 ;//| ADCPCTL6;
+    //Sample & hold time = 16 ADCCLK cycles | ADC on
+    ADCCTL0 = ADCSHT_2 | ADCON;
+    //TA0 trigger | SAMPCON triggered by sampling timer | repeat-sequence-of-channels
+    ADCCTL1 = ADCSHS_1 | ADCSHP | ADCCONSEQ_3 | ADCSSEL_1;
+    //10 bit (10 clock cycle conversion time)
+    ADCCTL2 = ADCRES;
+    //Configure ADC mux
+    ADCMCTL0 |= ADCINCH_5;//1001b = A9, 000b = Vr+ = AVCC and Vr- = AVSS
+    //Configure the interrupt
+    ADCIFG &= ~(0x01);//Clear interrupt flag
+    ADCIE = ADCIE0;
+    */
+/*
+ * ok zajibal...
+ * To configure the converter to perform successive conversions automatically and as quickly as possible, a
+multiple sample and convert function is available. When ADCMSC = 1, CONSEQx > 0, and the sample
+timer is used, the first rising edge of the SHI signal triggers the first conversion. Successive conversions
+are triggered automatically as soon as the prior conversion is completed. Additional rising edges on SHI
+are ignored until the sequence is completed in the single-sequence mode, or until the ADCENC bit is
+toggled in repeat-single-channel or repeated-sequence modes. The function of the ADCENC bit is
+unchanged when using the ADCMSC bit.
+ */
+    ADCCTL0 &= ~ADCENC; //Turn off ADC
+    //Init GPIO pins used for ADC
+    // Configure pins A2-A5 as ADC inputs
+    SYSCFG2 |= ADCPCTL2 | ADCPCTL3 | ADCPCTL4 | ADCPCTL5 ;//| ADCPCTL6;
+    //Sample & hold time = 16 ADCCLK cycles | ADC on
+    ADCCTL0 = ADCSHT_2 | ADCMSC | ADCON;
+    //TA0 trigger | SAMPCON triggered by sampling timer | repeat-sequence-of-channels
+    ADCCTL1 = ADCSHS_0 | ADCSHP | ADCCONSEQ_3 | ADCSSEL_1;
+    //10 bit (10 clock cycle conversion time)
+    ADCCTL2 = ADCRES;
+    //Configure ADC mux
+    ADCMCTL0 |= ADCINCH_5;//1001b = A9, 000b = Vr+ = AVCC and Vr- = AVSS
+    //Configure the interrupt
+    ADCIFG &= ~(0x01);//Clear interrupt flag
+    ADCIE = ADCIE0;
 
-    // Initialize RTC
-    // RTC count re-load compare value at 32.
-    // 1/32768 * 32 = x sec.
+
+
 
 }
 //----- Start scanning -----
 void IR_scan()
 {
-//    TA0CTL |= MC_1;// ACLK, up mode
-    //RTCMOD = 0x100;
-    RTCMOD = 0x1F;
-    RTCCTL = RTCSS__XT1CLK | RTCSR | RTCPS__1;  // | RTCIE;
-    ADCCTL0 |= ADCSC | ADCENC;                      // Enable conversion
+    //----- Configure RTC to trigger ADC  -----
+    // Using RTC as we need TA1 for PWM, and there is not connection between TA0 and ADC
+    // Initialize RTC
+    // RTC count re-load compare value at 32.
+    // 1/32768 * 328 = x sec.
+    RTCMOD = 0x400;
+    RTCCTL = RTCSS__XT1CLK | RTCSR | RTCPS_2; // | RTCIE;
+    ADCCTL0 |= ADCENC | ADCSC; // Enable ADC conversion
 }
