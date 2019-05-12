@@ -70,6 +70,28 @@ __interrupt void P1_interrupt_handler(void)
   __bic_SR_register_on_exit(LPM3_bits);         //Exit LPM3
 }
 
+// RTC interrupt service routine
+#if defined(__TI_COMPILER_VERSION__) || defined(__IAR_SYSTEMS_ICC__)
+#pragma vector=RTC_VECTOR
+__interrupt void RTC_ISR(void)
+#elif defined(__GNUC__)
+void __attribute__ ((interrupt(RTC_VECTOR))) RTC_ISR (void)
+#else
+#error Compiler not supported!
+#endif
+{
+    switch(__even_in_range(RTCIV,RTCIV_RTCIF))
+    {
+        case  RTCIV_NONE:   break;          // No interrupt
+        case  RTCIV_RTCIF:                  // RTC Overflow
+            P5OUT ^= BIT3;
+            StopCar();
+            scriptselector = -1;
+            break;
+        default: break;
+    }
+}
+
 //--------------- Function declarations ---------------
 void Bump_init()
 {
@@ -327,7 +349,9 @@ int main( void )
   P7OUT &= ~(BIT4 | BIT5);             // Drive P7.4 Low (Right) P7.5 Low (Left)
 
   P4SEL0|= BIT1 | BIT2;                // P4.2~P4.1: crystal pins
-
+  
+  
+  RTC_init(); // RTC Init
   //Bump_sensor Init
   Bump_init();
 

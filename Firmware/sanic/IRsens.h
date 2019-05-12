@@ -24,4 +24,5 @@ void IR_calibrate();//Calibrate the threshold value
 void IR_init();//Setup ADC & timer for A9 (P8.1) only
 void IR_scan();//Start ADC scan
 void IR_stop();//
+void RTC_init();
 #endif /* _IRSENS_H_ */

@@ -15,8 +15,6 @@ uint16_t Vbat = 0;
 
 //Using FRAM to store calibration values
 #ifdef __TI_COMPILER_VERSION__
-    //#pragma PERSISTENT(white_lvl)
-    //extern uint16_t white_lvl;
     #pragma DATA_SECTION(white_lvl, ".TI.persistent")
     uint16_t white_lvl = {0};
 #elif __IAR_SYSTEMS_ICC__
@@ -87,27 +85,6 @@ __interrupt void ADC_ISR(void)
         }
         default:
             break;
-    }
-}
-
-// RTC interrupt service routine
-#if defined(__TI_COMPILER_VERSION__) || defined(__IAR_SYSTEMS_ICC__)
-#pragma vector=RTC_VECTOR
-__interrupt void RTC_ISR(void)
-#elif defined(__GNUC__)
-void __attribute__ ((interrupt(RTC_VECTOR))) RTC_ISR (void)
-#else
-#error Compiler not supported!
-#endif
-{
-    switch(__even_in_range(RTCIV,RTCIV_RTCIF))
-    {
-        case  RTCIV_NONE:   break;          // No interrupt
-        case  RTCIV_RTCIF:                  // RTC Overflow
-            P5OUT ^= BIT3;
-            //ADCCTL0 |= ADCSC;// Enable conversion
-            break;
-        default: break;
     }
 }
 
@@ -208,7 +185,11 @@ void IR_scan()
     // Initialize RTC
     // RTC count re-load compare value at 32.
     // 1/32768 * 328 = x sec.
-    RTCMOD = 0x400;
-    RTCCTL = RTCSS__XT1CLK | RTCSR | RTCPS_2; // | RTCIE;
     ADCCTL0 |= ADCENC | ADCSC; // Enable ADC conversion
+}
+
+void RTC_init(){ // Function used to automatically stop the car after 2:30 mins
+  //RTCMOD = 1024/32768 * 4800 = 150 seconds
+  RTCMOD = 4800-1;
+  RTCCTL = RTCSS__XT1CLK | RTCSR | RTCPS__1024 | RTCIE; 
 }
