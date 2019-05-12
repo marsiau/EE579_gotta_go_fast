@@ -242,7 +242,6 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
     }
     break;
   case 3: //Compensate Steerings
-    P2OUT ^= BIT7;
     switch(scriptcount){
     case 0:
       __delay_cycles(10000);
