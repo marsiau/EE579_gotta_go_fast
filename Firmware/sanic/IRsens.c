@@ -7,7 +7,7 @@
 #include "IRsens.h"
 
 //--------------- Variable definitions ---------------
-const uint8_t ERR = 10;
+const uint8_t ERR = 50;
 bool calib_flag = false;
 uint8_t IRSens_flag = 0; // 0b00 A5 A4 A3 A2 0 0 
 uint16_t ADC_chnl;
