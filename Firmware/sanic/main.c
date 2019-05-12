@@ -84,7 +84,7 @@ void __attribute__ ((interrupt(RTC_VECTOR))) RTC_ISR (void)
     {
         case  RTCIV_NONE:   break;          // No interrupt
         case  RTCIV_RTCIF:                  // RTC Overflow
-            P5OUT |= BIT3;
+            P5OUT ^= BIT3;
             StopCar();
             scriptselector = -1;
             break;
