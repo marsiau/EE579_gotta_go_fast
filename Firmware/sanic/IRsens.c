@@ -48,11 +48,11 @@ __interrupt void ADC_ISR(void)
             {
                 //Store the value
                 SYSCFG0 &= ~PFWP;// Program FRAM write enable
-                white_lvl = ADCMEM0-ERR;//-ERR
+                white_lvl = ADCMEM0+ERR;//-ERR
                 SYSCFG0 |= PFWP;// Program FRAM write protected
                 calib_flag = false;
             }
-            else if(ADCMEM0 > white_lvl)
+            else if(ADCMEM0 < white_lvl)
             {
                 //ADC_chnl = (int)(ADCMCTL0 && 0xF); //Extract ADCINCHx
                 //ADC_chnl = (uint16_t) (ADCMCTL0 & 0xF); //Extract ADCINCHx
