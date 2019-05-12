@@ -11,7 +11,7 @@ const uint8_t ERR = 10;
 bool calib_flag = false;
 uint8_t IRSens_flag = 0; // 0b00 A5 A4 A3 A2 0 0 
 uint16_t ADC_chnl;
-uint16_t Vbat = 0;
+uint16_t Vbat = 4500;
 
 //Using FRAM to store calibration values
 #ifdef __TI_COMPILER_VERSION__
@@ -43,6 +43,7 @@ __interrupt void ADC_ISR(void)
             break;
         case ADCIV_ADCIFG:
         {
+            P5OUT ^= BIT5;
             if(calib_flag)
             {
                 //Store the value
@@ -172,10 +173,6 @@ unchanged when using the ADCMSC bit.
     //Configure the interrupt
     ADCIFG &= ~(0x01);//Clear interrupt flag
     ADCIE = ADCIE0;
-
-
-
-
 }
 //----- Start scanning -----
 void IR_scan()

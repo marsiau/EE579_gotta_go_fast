@@ -6,7 +6,7 @@
 bool initialised = false;
 int DutyCycle = 99; // The Duty Cycle of the PWMs
 int PWMPeriod = 100; // This defines the value of the CCR0
-//unsigned int Vbat = 450; // Battery Voltage Placeholder
+
 // Movement flags used to determine the status of the car
 enum FwdRwd_flag drive_flag = Stop;
 enum LR_flag steer_flag = Neutral;
@@ -84,7 +84,7 @@ void __attribute__ ((interrupt(RTC_VECTOR))) RTC_ISR (void)
     {
         case  RTCIV_NONE:   break;          // No interrupt
         case  RTCIV_RTCIF:                  // RTC Overflow
-            P5OUT ^= BIT3;
+            P5OUT |= BIT3;
             StopCar();
             scriptselector = -1;
             break;
@@ -120,7 +120,7 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
 
   // This part is used to test that 331 cycles = 1 second by toggling the LED
   if(MovementCyclesCounter == MovementCyclesLimit){
-    P5OUT ^= BIT4; // Led is toggled every 3.02ms (DEBUGGER)
+    P5OUT ^= BIT4; // Led is toggled every 250ms (DEBUGGER)
     if(drive_flag == Forward) TA1CCR1 = DutyCycle; // Update duty cycle
     else if(drive_flag == Reverse) TA1CCR2 = DutyCycle; // Update duty cycle
     MovementCyclesCounter = 0;
@@ -131,9 +131,9 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
 
   //--------------------------------------------------
   // Duty Cycle selector
-  if(running == 0) DutyCycle = 60;
+  if(running == 0) DutyCycle = 90;
   else{
-    if(Vbat > 4400) DutyCycle = 20;
+    if(Vbat > 4400) DutyCycle = 50;
     else if(Vbat > 4300) DutyCycle = 75;
     else if(Vbat > 4200) DutyCycle = 80;
     else if(Vbat > 4100) DutyCycle = 85;
@@ -263,7 +263,6 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
     }
     break;
   case 3: //Compensate Steering state
-    P2OUT ^= BIT7;
     switch(scriptcount){
     case 0:
       __delay_cycles(10000);
@@ -350,16 +349,14 @@ int main( void )
 
   P4SEL0|= BIT1 | BIT2;                // P4.2~P4.1: crystal pins
 
+  RTC_init();                           // RTC Init
+  Bump_init();                          // Bump_sensor Init
 
-  RTC_init(); // RTC Init
-  //Bump_sensor Init
-  Bump_init();
-
-  P5DIR |= BIT5 | BIT4 | BIT3; // (DEBUGGER) Used to visualize the movement cycles during the run time
-
+  P5DIR |= BIT5 | BIT4 | BIT3; // (DEBUGGER) LEDs
+  P5OUT &= ~(BIT3 | BIT5);
   ACLKClockSetup();           // Connects the external oscillator XT1 to ACLK
   PWM_TimerSetup();           // Sets up the timer of the PWM
-  PWM_PeriodSetup(PWMPeriod);       // Sets up the period of the PWM
+  PWM_PeriodSetup(PWMPeriod); // Sets up the period of the PWM
   //initialised = false;
   //BumpSwitch_flag = 0x00;
   __enable_interrupt();
