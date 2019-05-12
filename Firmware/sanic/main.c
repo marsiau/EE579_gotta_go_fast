@@ -314,9 +314,9 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
     if(steer_flag != Neutral){
       // If the cycle limit has not been reached and the status flag is not "Neutral" then increment the Cycle counter
       RLCycle++;
-      if((steer_flag == Left && drive_flag = Forward) || (steer_flag == Right && drive_flag = Reverse))
+      if((steer_flag == Left && drive_flag == Forward) || (steer_flag == Right && drive_flag == Reverse))
         LCycles++;
-      else if((steer_flag == Right && drive_flag = Forward) || (steer_flag == Left && drive_flag = Reverse))
+      else if((steer_flag == Right && drive_flag == Forward) || (steer_flag == Left && drive_flag == Reverse))
         RCycles++;
     }
   }
