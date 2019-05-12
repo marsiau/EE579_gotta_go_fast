@@ -10,9 +10,18 @@
 const uint8_t ERR = 10;
 bool calib_flag = false;
 uint8_t IRSens_flag = 0; // 0b00 A5 A4 A3 A2 0 0 
-uint16_t white_lvl;
 uint16_t ADC_chnl;
 uint16_t Vbat = 0;
+
+//Using FRAM to store calibration values
+#ifdef __TI_COMPILER_VERSION__
+    //#pragma PERSISTENT(white_lvl)
+    //extern uint16_t white_lvl;
+    #pragma DATA_SECTION(white_lvl, ".TI.persistent")
+    uint16_t white_lvl = {0};
+#elif __IAR_SYSTEMS_ICC__
+    __persistent extern uint16_t white_lvl;
+#endif
 
 //--------------- Interrupt routines ---------------
 //----- Interrupt routine for ADC -----
