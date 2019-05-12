@@ -95,7 +95,7 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
 #endif
 {
   if(initialised);
-    
+
   // This part is used to test that 331 cycles = 1 second by toggling the LED
   if(MovementCyclesCounter == MovementCyclesLimit){
     P5OUT ^= BIT4; // Led is toggled every 3.02ms (DEBUGGER)
@@ -106,7 +106,7 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
   else{
     MovementCyclesCounter++;// Used to toggle LED4.0 every second
   }
-  
+
   //--------------------------------------------------
   // Duty Cycle selector
   if(running == 0) DutyCycle = 60;
@@ -119,7 +119,7 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
     else if(Vbat > 3900) DutyCycle = 95;
     else DutyCycle = 99;
   }
-  
+
   //--------------------------------------------------
   //Forward-sensor Script
   switch(scriptselector){
@@ -230,17 +230,17 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
       break;
     case 1:
       if(!running)
-        Drive_FWD(DutyCycle,15000);
+        Drive_FWD(DutyCycle,662); //2secs
       running = 1;
       if(drive_flag == Stop){
         scriptcount++;
         running = 0;
       }
       break;
-    default: running = 0; scriptcount = 0; break;
+    default: running = 0; scriptselector = 3; scriptcount = 0; break;
     }
     break;
-  case 3: //Compensate Steerings
+  case 3: //Compensate Steering state
     P2OUT ^= BIT7;
     switch(scriptcount){
     case 0:
@@ -270,7 +270,7 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
     }
     break;
   }
-  
+
   if(FwdRwdCycle < FwdRwdCyclesLimit){
     if(drive_flag != Stop){
       // If the cycle limit has not been reached and the status flag is not "Stop" then increment the Cycle counter
@@ -287,7 +287,7 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
     TA1CCTL1 = OUTMOD_5;                     // CCR2 reset      P1.7/TA0.1
     TA1CCTL2 = OUTMOD_5;                     // CCR2 reset      P1.6/TA0.2
   }
-  
+
   if(RLCycle < RLCyclesLimit){
     if(steer_flag != Neutral){
       // If the cycle limit has not been reached and the status flag is not "Neutral" then increment the Cycle counter
@@ -315,22 +315,22 @@ int main( void )
   // Disable the GPIO power-on default high-impedance mode to activate
   // previously configured port settings
   PM5CTL0 &= ~LOCKLPM5;
-  
+
   P4DIR |= BIT0;     // P4.0 (FWD)
   P8DIR |= BIT3;     // P8.3 (RWD)
-  
+
   P4SEL0 |= BIT0;     // Secondary function PWM output TA1.1
   P8SEL0 |= BIT3;     // Secondary function PWM output TA1.2
-  
+
   P7DIR |= BIT5 | BIT4;                //P7.5(Left) P7.4(Right) output mode
-  
+
   P7OUT &= ~(BIT4 | BIT5);             // Drive P7.4 Low (Right) P7.5 Low (Left)
-  
+
   P4SEL0|= BIT1 | BIT2;                // P4.2~P4.1: crystal pins
-  
+
   //Bump_sensor Init
   Bump_init();
-  
+
   P5DIR |= BIT5 | BIT4 | BIT3; // (DEBUGGER) Used to visualize the movement cycles during the run time
 
   ACLKClockSetup();           // Connects the external oscillator XT1 to ACLK
