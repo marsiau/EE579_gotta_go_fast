@@ -131,7 +131,7 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
 
   //--------------------------------------------------
   // Duty Cycle selector
-  if(running == 0) DutyCycle = 50;
+  if(running == 0) DutyCycle = 70;
   else{
     if(Vbat > 4400) DutyCycle = 5;
     else if(Vbat > 4300) DutyCycle = 75;
