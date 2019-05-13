@@ -97,6 +97,7 @@ void IR_calibrate()
      * Assuming it's only done before IR_scan()
      * Blink lights when finished!
     */
+#if 0
     calib_flag = true;
 
     SYSCFG2 |= ADCPCTL3;// Configure ADC A3 pin
@@ -110,46 +111,26 @@ void IR_calibrate()
     ADCIE |= ADCIE0;// Enable ADC conv complete interrupt
 
     ADCCTL0 |= ADCENC | ADCSC;//Enable a single conversion
+#else
+    calib_flag = true;
+
+    SYSCFG2 |= ADCPCTL5;// Configure ADC A5 pin
+    ADCCTL0 |= ADCSHT_2 | ADCON;// ADCON, S&H=16 ADC clks
+    ADCCTL1 |= ADCSHS_0;//ADCSC as ADC sample-and-hold source
+    ADCCTL1 |= ADCSHP;// ADCCLK = MODOSC; sampling timer
+    ADCCTL2 |= ADCRES;// 10-bit conversion results
+    ADCMCTL0 |= ADCINCH_5;// A3 ADC input select; Vref=AVCC
+
+    ADCIFG &= ~(0x01);//Clear interrupt flag
+    ADCIE |= ADCIE0;// Enable ADC conv complete interrupt
+
+    ADCCTL0 |= ADCENC | ADCSC;//Enable a single conversion
+#endif
 }
 //----- Initialise ADC Scan -----
 void IR_init()
 {
-    /*
-    //Init GPIO pins used for ADC
-    // Configure pins A2-A5 as ADC inputs
-    SYSCFG2 |= ADCPCTL2 | ADCPCTL3 | ADCPCTL4 | ADCPCTL5 | ADCPCTL6;
-    //Sample & hold time = 16 ADCCLK cycles | ADC on
-    ADCCTL0 |= ADCSHT_2  | ADCMSC | ADCON;
-    //TA0 trigger | SAMPCON triggered by sampling timer | repeat-sequence-of-channels
-    ADCCTL1 |= ADCSHS_1 | ADCSHP | ADCCONSEQ_2 | ADCSSEL_1;
-    //10 bit (10 clock cycle conversion time)
-    ADCCTL2 |= ADCRES;
-    //Configure ADC mux
-    ADCMCTL0 |= ADCINCH_5;//1001b = A9, 000b = Vr+ = AVCC and Vr- = AVSS
-    //Configure the interrupt
-    ADCIFG &= ~(0x01);//Clear interrupt flag
-    ADCIE |= ADCIE0;
-    */
-     /*
-     // with RTC
-    ADCCTL0 &= ~ADCENC; //Turn off ADC
-    //Init GPIO pins used for ADC
-    // Configure pins A2-A5 as ADC inputs
-    SYSCFG2 |= ADCPCTL2 | ADCPCTL3 | ADCPCTL4 | ADCPCTL5 ;//| ADCPCTL6;
-    //Sample & hold time = 16 ADCCLK cycles | ADC on
-    ADCCTL0 = ADCSHT_2 | ADCON;
-    //TA0 trigger | SAMPCON triggered by sampling timer | repeat-sequence-of-channels
-    ADCCTL1 = ADCSHS_1 | ADCSHP | ADCCONSEQ_3 | ADCSSEL_1;
-    //10 bit (10 clock cycle conversion time)
-    ADCCTL2 = ADCRES;
-    //Configure ADC mux
-    ADCMCTL0 |= ADCINCH_5;//1001b = A9, 000b = Vr+ = AVCC and Vr- = AVSS
-    //Configure the interrupt
-    ADCIFG &= ~(0x01);//Clear interrupt flag
-    ADCIE = ADCIE0;
-    */
 /*
- * ok zajibal...
  * To configure the converter to perform successive conversions automatically and as quickly as possible, a
 multiple sample and convert function is available. When ADCMSC = 1, CONSEQx > 0, and the sample
 timer is used, the first rising edge of the SHI signal triggers the first conversion. Successive conversions
