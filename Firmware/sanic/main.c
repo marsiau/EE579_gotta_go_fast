@@ -5,7 +5,7 @@
 
 bool initialised = false;
 int DutyCycle = 99; // The Duty Cycle of the PWMs
-int PWMPeriod = 100; // This defines the value of the CCR0
+int PWMPeriod = 200; // This defines the value of the CCR0
 
 // Movement flags used to determine the status of the car
 enum FwdRwd_flag drive_flag = Stop;
@@ -32,7 +32,7 @@ int MovementCyclesCounter = 0; // Counts the number of cycles (DEBUGGING)
 
 // Duration of the movements is in seconds (DEBUGGING)
 int ForwardCycleCounterLimit =  3 * 83;
-int ReverseCycleCounterLimit = 3 * 83; //331 is 1s, 83 = 0.25ss
+int ReverseCycleCounterLimit = 2 * 83; //331 is 1s, 83 = 0.25ss
 int LeftCycleCounterLimit = 3 * 83;
 int RightCycleCounterLimit = 3 * 83;
 // ---------------------------
@@ -131,7 +131,7 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
 
   //--------------------------------------------------
   // Duty Cycle selector
-  if(running == 0) DutyCycle = 70;
+  if(running == 0) DutyCycle =  90;
   else{
     if(Vbat > 4400) DutyCycle = 5;
     else if(Vbat > 4300) DutyCycle = 75;
@@ -156,7 +156,7 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
     case 1:
       if(!running)
         Drive_RWD(DutyCycle,ReverseCycleCounterLimit);
-      Steer_Right(ReverseCycleCounterLimit);
+      //sSteer_Right(ReverseCycleCounterLimit);
       running = 1;
       if(drive_flag == Stop){
         scriptcount++;
@@ -205,7 +205,7 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
     case 1:
       if(!running)
         Drive_RWD(DutyCycle,ReverseCycleCounterLimit);
-      Steer_Left(ReverseCycleCounterLimit);
+      //Steer_Left(ReverseCycleCounterLimit);
       running = 1;
       if(drive_flag == Stop){
         scriptcount++;
@@ -247,12 +247,13 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
     switch(scriptcount){
     case 0:
       StopCar();
+      __delay_cycles(10000);
       running = 0;
       scriptcount++;
       break;
     case 1:
       if(!running)
-        Drive_FWD(DutyCycle,662); //2secs
+        Drive_FWD(DutyCycle,41); //2secs
       running = 1;
       if(drive_flag == Stop){
         scriptcount++;
