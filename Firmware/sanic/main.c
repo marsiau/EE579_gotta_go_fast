@@ -27,7 +27,7 @@ int scriptcount = -1;
 int scriptselector = -1;
 
 // Debugging variables
-int MovementCyclesLimit = 83; // 1 second = 331 Cycles (DEBUGGING)
+int MovementCyclesLimit = 41; // 1 second = 331 Cycles (DEBUGGING)
 int MovementCyclesCounter = 0; // Counts the number of cycles (DEBUGGING)
 
 // Duration of the movements is in seconds (DEBUGGING)
@@ -131,9 +131,9 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
 
   //--------------------------------------------------
   // Duty Cycle selector
-  if(running == 0) DutyCycle = 90;
+  if(running == 0) DutyCycle = 50;
   else{
-    if(Vbat > 4400) DutyCycle = 50;
+    if(Vbat > 4400) DutyCycle = 5;
     else if(Vbat > 4300) DutyCycle = 75;
     else if(Vbat > 4200) DutyCycle = 80;
     else if(Vbat > 4100) DutyCycle = 85;
@@ -259,7 +259,7 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
         running = 0;
       }
       break;
-    default: running = 0; scriptselector = 3; scriptcount = 0; break;
+    default: running = 0; scriptselector = 2; scriptcount = 0; break;
     }
     break;
   case 3: //Compensate Steering state
