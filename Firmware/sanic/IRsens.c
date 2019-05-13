@@ -18,7 +18,7 @@ uint16_t Vbat = 4500;
     #pragma DATA_SECTION(white_lvl, ".TI.persistent")
     uint16_t white_lvl = {0};
 #elif __IAR_SYSTEMS_ICC__
-    __persistent uint16_t white_lvl;
+    __persistent extern uint16_t white_lvl;
 #endif
 
 //--------------- Interrupt routines ---------------
