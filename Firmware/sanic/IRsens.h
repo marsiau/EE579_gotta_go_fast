@@ -9,7 +9,6 @@
 #include <msp430.h>
 #include <stdint.h>//For uintX_t
 #include <stdbool.h>//For bool
-//#include <string.h>//For strcpy()
 
 //----- Variable definitions -----
 //Constants

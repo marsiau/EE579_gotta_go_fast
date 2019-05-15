@@ -1,7 +1,6 @@
-//#include <msp430.h> --included by irsense
+#include <msp430.h>
 #include "PWMsetup.h"
 #include "IRsens.h"
-
 
 bool initialised = false;
 int DutyCycle = 99; // The Duty Cycle of the PWMs
@@ -31,10 +30,7 @@ int MovementCyclesLimit = 41; // 1 second = 331 Cycles (DEBUGGING)
 int MovementCyclesCounter = 0; // Counts the number of cycles (DEBUGGING)
 
 // Duration of the movements is in seconds (DEBUGGING)
-int ForwardCycleCounterLimit =  3 * 83;
-int ReverseCycleCounterLimit = 2 * 83; //331 is 1s, 83 = 0.25ss
-int LeftCycleCounterLimit = 3 * 83;
-int RightCycleCounterLimit = 3 * 83;
+int ReverseCycleCounterLimit = 83; //331 is 1s, 83 = 0.25ss
 // ---------------------------
 //----- Function declarations -----
 
@@ -156,7 +152,6 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
     case 1:
       if(!running)
         Drive_RWD(DutyCycle,ReverseCycleCounterLimit);
-      //sSteer_Right(ReverseCycleCounterLimit);
       running = 1;
       if(drive_flag == Stop){
         scriptcount++;
@@ -205,7 +200,6 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
     case 1:
       if(!running)
         Drive_RWD(DutyCycle,ReverseCycleCounterLimit);
-      //Steer_Left(ReverseCycleCounterLimit);
       running = 1;
       if(drive_flag == Stop){
         scriptcount++;
@@ -247,13 +241,13 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
     switch(scriptcount){
     case 0:
       StopCar();
-      __delay_cycles(10000);
+      __delay_cycles(400000);
       running = 0;
       scriptcount++;
       break;
     case 1:
       if(!running)
-        Drive_FWD(DutyCycle,41); //2secs
+        Drive_FWD(DutyCycle,41); //0.1 secs
       running = 1;
       if(drive_flag == Stop){
         scriptcount++;
@@ -306,8 +300,8 @@ void __attribute__ ((interrupt(TIMER1_A0_VECTOR))) Timer_A (void)
     FwdRwdCycle = 0;                         // Reset the cycle counter
     TA1CCR1 = 0;                             // Set the "DutyCycle" to 0
     TA1CCR2 = 0;                             // Set the "DutyCycle" to 0
-    TA1CCTL1 = OUTMOD_5;                     // CCR2 reset      P1.7/TA0.1
-    TA1CCTL2 = OUTMOD_5;                     // CCR2 reset      P1.6/TA0.2
+    TA1CCTL1 = OUTMOD_5;                     // CCR2 reset      P4.0/TA1.1
+    TA1CCTL2 = OUTMOD_5;                     // CCR2 reset      P8.3/TA1.2
   }
 
   if(RLCycle < RLCyclesLimit){
@@ -354,12 +348,12 @@ int main( void )
   Bump_init();                          // Bump_sensor Init
 
   P5DIR |= BIT5 | BIT4 | BIT3; // (DEBUGGER) LEDs
-  P5OUT &= ~(BIT3 | BIT5);
+  P5OUT &= ~(BIT3 | BIT4 | BIT5);
+  
   ACLKClockSetup();           // Connects the external oscillator XT1 to ACLK
   PWM_TimerSetup();           // Sets up the timer of the PWM
   PWM_PeriodSetup(PWMPeriod); // Sets up the period of the PWM
-  //initialised = false;
-  //BumpSwitch_flag = 0x00;
+
   __enable_interrupt();
   while(!initialised)
   {
@@ -381,9 +375,6 @@ int main( void )
       __delay_cycles(500000);
       P5OUT &= ~(BIT5);
       BumpSwitch_flag = 0x00;
-      //scriptselector = 2; //Select Back Sensor Script(Go forward)
-      //scriptcount = 0; //Reset
-      //running = 0; //Not currently running a script (For movement loop logic)
     }
   }
   while(1)
@@ -418,7 +409,7 @@ int main( void )
     else if(IRSens_flag & 0x8 | BumpSwitch_flag & 0x02) //1.3 A3 Front (Lowest priority / if only front sensor)
     {
       StopCar(); //Stop Immediately
-      if(LCycles >= RCycles)
+      if(LCycles > RCycles)
           scriptselector = 1; //Either 0 or 1 for randomness (Forward right is 0, forward left sensor is 1)
       else
           scriptselector = 0;
