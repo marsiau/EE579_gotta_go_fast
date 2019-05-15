@@ -17,8 +17,8 @@ void ACLKClockSetup(){
 void PWM_TimerSetup(){
   TA1CTL = TASSEL__ACLK | MC__UP | TACLR;  // ACLK, UP mode, clear TAR
   TA1CCTL0 |= CCIE;                        // Enable interrupt when CCR0 value is reached
-  TA1CCTL1 = OUTMOD_7;                     // CCR1 reset/set  P4.0/TA1.1 FWD
-  TA1CCTL2 = OUTMOD_7;                     // CCR2 reset/set  P8.3/TA1.2 RWD
+  TA1CCTL1 = OUTMOD_7;                     // CCR1 reset/set  P4.0/TA1.1 RWD
+  TA1CCTL2 = OUTMOD_7;                     // CCR2 reset/set  P8.3/TA1.2 FWD
 }
 
 void PWM_PeriodSetup(int Period){
@@ -28,8 +28,8 @@ void PWM_PeriodSetup(int Period){
 void StopCar(){		                   // Stops the car
   TA1CCR1 = 0;                             // Set the "DutyCycle" to 0        
   TA1CCR2 = 0;                             // Set the "DutyCycle" to 0
-  TA1CCTL1 = OUTMOD_5;                     // CCR1 reset   P4.0/TA1.1 FWD
-  TA1CCTL2 = OUTMOD_5;                     // CCR2 reset   P8.3/TA1.2 RWD
+  TA1CCTL1 = OUTMOD_5;                     // CCR1 reset   P4.0/TA1.1 RWD
+  TA1CCTL2 = OUTMOD_5;                     // CCR2 reset   P8.3/TA1.2 FWD
   TA1CTL |= TACLR;                        
   P7OUT &= ~BIT4;                          //P7.4 Right
   P7OUT &= ~BIT5;                          //P7.5 Left
@@ -43,8 +43,8 @@ void Drive_RWD(int DutyCycle, int CyclesLimit){ // Moves the car forward with a 
   FwdRwdCycle = 0;                         // Resets the global cycle counter
   TA1CCR1 = DutyCycle;                     
   TA1CCR2 = 0;                             // Set the "DutyCycle" to 0
-  TA1CCTL1 = OUTMOD_7;                     // CCR1 reset/set  P4.0/TA1.1 FWD
-  TA1CCTL2 = OUTMOD_5;                     // CCR2 reset      P8.3/TA1.2 RWD
+  TA1CCTL1 = OUTMOD_7;                     // CCR1 reset/set  P4.0/TA1.1 RWD
+  TA1CCTL2 = OUTMOD_5;                     // CCR2 reset      P8.3/TA1.2 FWD
 }
 
 void Drive_FWD(int DutyCycle, int CyclesLimit){    // Moves the car backwards with a duty cycle given by "DutyCycle"
@@ -53,8 +53,8 @@ void Drive_FWD(int DutyCycle, int CyclesLimit){    // Moves the car backwards wi
   FwdRwdCycle = 0;                         // Resets the global cycle counter
   TA1CCR1 = 0;                             // Set the "DutyCycle" to 0
   TA1CCR2 = DutyCycle;
-  TA1CCTL1 = OUTMOD_5;                     // CCR1 reset      P4.0/TA1.1 FWD
-  TA1CCTL2 = OUTMOD_7;                     // CCR2 reset/set  P8.3/TA1.2 RWD
+  TA1CCTL1 = OUTMOD_5;                     // CCR1 reset      P4.0/TA1.1 RWD
+  TA1CCTL2 = OUTMOD_7;                     // CCR2 reset/set  P8.3/TA1.2 FWD
 }
 
 void Steer_Left(int CyclesLimit){	    // Steers the car Left
